@@ -1,3 +1,8 @@
+wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip \
+unzip plink2_linux* \
+wget https://github.com/rgcgithub/regenie/releases/download/v3.2.8/regenie_v3.2.8.gz_x86_64_Linux.zip \
+unzip regenie_v3.2.8.gz_x86_64_Linux.zip
+
 curr_chr="chr16"
 gsutil -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/pgen_minimal_qc/plink_${curr_chr}_multi_split* . ;\
 mkdir plink_${curr_chr}_corrected_ids ;\
