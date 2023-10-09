@@ -1,7 +1,7 @@
 curr_chr="chr16"
 gsutil -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/pgen_minimal_qc/plink_${curr_chr}_multi_split* . ;\
 mkdir plink_${curr_chr}_corrected_ids ;\
-for file in plink_${curr_chr}_multi_split.pgen/*.pgen ; do ;\
+for file in plink_${curr_chr}_multi_split.pgen/*.pgen ; do \
     prefix=${file%.pgen} ; prefix2=${prefix##*/} ; echo $prefix ;\        
     ./plink2 --pfile plink_${curr_chr}_multi_split.pgen/${prefix2} \
               --set-all-var-ids @:#:\$r,\$a --make-pgen --out plink_${curr_chr}_corrected_ids/${prefix2} \
