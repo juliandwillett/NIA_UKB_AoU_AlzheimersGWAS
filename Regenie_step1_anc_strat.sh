@@ -13,7 +13,7 @@ gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae
 gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_covar.txt .
 
 # run regenie on individuals of each ancestry
-ancestries=("eur" "afr" "amr" "eas" "sas" "mid")
+ancestries=("eur" "afr" "amr" "eas" "sas") # skip mid due to too small sample size then convergence issue with regenie
 for anc in "${ancestries[@]}" ; do \
     echo "Curr anc: $anc"
 
