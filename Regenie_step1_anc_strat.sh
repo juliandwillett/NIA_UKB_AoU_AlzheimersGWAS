@@ -18,7 +18,7 @@ for anc in "${ancestries[@]}" ; do \
     echo "Curr anc: $anc"
 
     # make ancestry specific ID files
-    awk -v anc=$anc '$2 == anc { print $1 }' ancestry_preds.tsv > ${anc}_ids.txt
+    awk -v anc=$anc '$2 == anc { print "0" "\t" $1 }' ancestry_preds.tsv > ${anc}_ids.txt
 
     # run regenie step 1
     ./regenie_v3.2.8.gz_x86_64_Linux \
@@ -27,13 +27,11 @@ for anc in "${ancestries[@]}" ; do \
     --phenoFile regenie_pheno.txt \
     --covarFile regenie_covar.txt \
     --bt \
-    --out aou_step1_rg_array_anc_{anc} \
+    --out aou_step1_rg_array_anc_${anc} \
     --bsize 1000 \
-    --keep {anc}_ids.txt \
+    --keep ${anc}_ids.txt \
     --lowmem \
-    --lowmem-prefix tmp_rg", shell=True).decode('utf-8'))
-    
-    print(subprocess.check_output(f"gsutil -u $GOOGLE_PROJECT -m cp aou_step1_rg_array_20pcs_withsex_{anc}* {my_bucket}/data/regenie/", shell=True).decode('utf-8'))
+    --lowmem-prefix tmp_rg
 done
 
 gsutil -u $GOOGLE_PROJECT -m cp -r -n aou_step1_rg_array_anc_* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie/
