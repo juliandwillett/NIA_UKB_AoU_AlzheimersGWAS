@@ -62,7 +62,9 @@ for ((i=1; i<=16; i++)); do \
         --bsize 400 \
         --out aou_step2_rg_${curr_chr}_common_anc_${anc} \
         --minMAC 100
-  done 
+  done
+  rm plink_${curr_chr}_multi_split_merged* ;\
+  rm plink_${curr_chr}_multi_split_merged_common_anc_${anc}* ;\
 done
 
 # backup results
