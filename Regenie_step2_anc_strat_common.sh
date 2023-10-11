@@ -17,8 +17,18 @@ gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae
 mkdir step1_files
 gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie/* step1_files/
 
-# run loop. Run by chr because faster than ancestry first. Do 1-16 and 17-22 separately due to different naming scheme
+# rename pred file as needed, replace second string with workspace ID. Run only once, otherwise errors
 ancestries=("eur" "afr" "amr" "eas")
+for anc in "${ancestries[@]}" ; do \ 
+  awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofduplicateofalzheimersgwastake6", $2)} 1' \
+      aou_step1_rg_array_${anc}_all_pred.list > revised_pred_${anc}.list
+done
+
+
+##################################
+
+# run loop. Run by chr because faster than ancestry first. Do 1-16 and 17-22 separately due to different naming scheme
+
 for ((i=1; i<=16; i++)); do   
   curr_chr="chr${i}"
 
@@ -29,27 +39,28 @@ for ((i=1; i<=16; i++)); do
     echo "Curr chr: ${curr_chr}. Curr anc: ${anc}" ;\
     awk -v anc=$anc '$2 == anc { print "0" "\t" $1 }' ancestry_preds.tsv > ${anc}_ids.txt
 
-    # get select variants
+    # run
     ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
-            --make-pgen --out plink_${curr_chr}_multi_split_merged_common_${anc} \
-            --maf 0.01 --keep ${anc}_ids.txt --geno 0.1 --mind 0.1 --hwe 1e-15
+        --geno 0.1 --mind 0.1 --hwe 1e-15 --maf 0.01 --keep ${anc}_ids.txt \
+        --make-pgen --out plink_${curr_chr}_multi_split_merged_common_anc_${anc} ;\
 
-    # run regenie step 2
+    # deal with loss of empty columns
+    awk 'BEGIN{OFS="\t"} NR==1 {print "#FID", "IID", $2} NR>1 {print "0", $1, $2}' \
+    plink_${curr_chr}_multi_split_merged_common_anc_all.psam > tmp.psam ; \
+    mv tmp.psam plink_${curr_chr}_multi_split_merged_common_anc_all.psam
+
+    # run regenie
     ./regenie_v3.2.8.gz_x86_64_Linux \
-          --step 2 \
-          --bgen plink_{curr_chr}_multi_split_zeroFID_commonvariants_{anc}.bgen \
-          --sample plink_{curr_chr}_multi_split_zeroFID_commonvariants_{anc}.sample \
-          --phenoFile regenie_pheno_zeroFID.txt \
-          --covarFile regenie_covars_20pcs_withsex_zeroFID.txt \
-          --bt \
-          --keep {anc}_ids.txt \
-          --firth --approx --pThresh 0.01 \
-          --pred aou_step1_rg_array_20pcs_withsex_{anc}_pred.list \
-          --bsize 400 \
-          --out aou_step2_rg_{curr_chr}_common_20pcs_withsex_{anc} \
-          --minMAC 100
-
-    # backup files
-    gsutil -m cp -r -n 
+        --step 2 \
+        --pgen plink_${curr_chr}_multi_split_merged_common_anc_all \
+        --phenoFile regenie_pheno.txt \
+        --covarFile regenie_covar.txt \
+        --bt \
+        --keep ${anc}_ids.txt \
+        --firth --approx --pThresh 0.01 \
+        --pred revised_pred.list \
+        --bsize 400 \
+        --out aou_step2_rg_${curr_chr}_common_anc_all \
+        --minMAC 100  
   done 
 done
