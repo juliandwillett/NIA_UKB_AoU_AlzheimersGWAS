@@ -7,10 +7,10 @@ outcomes=("AD" "Dementia" "Dementia_By_Proxy" "AD_any" "Dementia_any")
 # merge files
 for outcome in "${outcomes[@]}" ; do \
   echo "On outcome $outcome"
-  head -n 1 gwas/aou_step2_rg_chr1_common_anc_all_AD_any.regenie > aou_AD_any_anc_all_gwas.txt ;\
+  head -n 1 gwas/aou_step2_rg_chr1_common_anc_all_${outcome}.regenie > aou_${outcome}_anc_all_gwas.txt ;\
   for ((i=1; i<=22; i++)); do \
-    file="gwas/aou_step2_rg_chr${i}_common_anc_all_AD_any.regenie" ;\
-    tail -n +2 "$file" >> aou_AD_any_anc_all_gwas.txt ;\
+    file="gwas/aou_step2_rg_chr${i}_common_anc_all_${outcome}.regenie" ;\
+    tail -n +2 "$file" >> aou_${outcome}_anc_all_gwas.txt ;\
   done \
 done
 
