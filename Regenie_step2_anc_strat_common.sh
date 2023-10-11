@@ -41,7 +41,7 @@ for ((i=1; i<=16; i++)); do \
 
     # run
     ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
-        --geno 0.1 --mind 0.1 --hwe 1e-15 --maf 0.01 --keep ${anc}_ids.txt \
+        --geno 0.1 --mind 0.1 --hwe 1e-15 --maf 0.01 \
         --make-pgen --out plink_${curr_chr}_multi_split_merged_common_anc_${anc} ;\
 
     # deal with loss of empty columns
