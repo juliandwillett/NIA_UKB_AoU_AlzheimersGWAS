@@ -30,8 +30,8 @@ for ((i=1; i<=16; i++)); do
 
     # get select variants
     ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
-            --export bgen-1.1 --out plink_{curr_chr}_multi_split_zeroFID_commonvariants_{anc} \
-            --maf 0.01
+            --make-pgen --out plink_${curr_chr}_multi_split_merged_common_${anc} \
+            --maf 0.01 --keep 
 
     # run regenie step 2
     ./regenie_v3.2.8.gz_x86_64_Linux \
