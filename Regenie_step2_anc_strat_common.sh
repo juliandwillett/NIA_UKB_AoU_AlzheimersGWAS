@@ -27,11 +27,12 @@ for ((i=1; i<=16; i++)); do
   
   for anc in "${ancestries[@]}" ; do \    
     echo "Curr chr: ${curr_chr}. Curr anc: ${anc}" ;\
+    awk -v anc=$anc '$2 == anc { print "0" "\t" $1 }' ancestry_preds.tsv > ${anc}_ids.txt
 
     # get select variants
     ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
             --make-pgen --out plink_${curr_chr}_multi_split_merged_common_${anc} \
-            --maf 0.01 --keep 
+            --maf 0.01 --keep ${anc}_ids.txt --geno 0.1 --mind 0.1 --hwe 1e-15
 
     # run regenie step 2
     ./regenie_v3.2.8.gz_x86_64_Linux \
