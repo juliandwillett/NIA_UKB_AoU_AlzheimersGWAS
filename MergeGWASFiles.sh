@@ -14,4 +14,5 @@ for outcome in "${outcomes[@]}" ; do \
   done \
 done
 
-
+# convert to tsv, so it works with locus zoom
+# Refer to Rmd file in FASRC
