@@ -34,15 +34,13 @@ for ((i=1; i<=16; i++)); do \
 
   # get curr chr files
   gsutil -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/pgen_minimal_qc/plink_${curr_chr}_multi_split_merged* . ;\
+  ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
+        --geno 0.1 --mind 0.1 --hwe 1e-15 --maf 0.01 \
+        --make-pgen --out plink_${curr_chr}_multi_split_merged_common
   
   for anc in "${ancestries[@]}" ; do \    
     echo "Curr chr: ${curr_chr}. Curr anc: ${anc}" ;\
     awk -v anc=$anc '$2 == anc { print "0" "\t" $1 }' ancestry_preds.tsv > ${anc}_ids.txt ;\
-
-    # run
-    ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
-        --geno 0.1 --mind 0.1 --hwe 1e-15 --maf 0.01 \
-        --make-pgen --out plink_${curr_chr}_multi_split_merged_common ;\
 
     # deal with loss of empty columns
     awk 'BEGIN{OFS="\t"} NR==1 {print "#FID", "IID", $2} NR>1 {print "0", $1, $2}' \
