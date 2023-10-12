@@ -42,17 +42,17 @@ for ((i=1; i<=16; i++)); do \
     # run
     ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
         --geno 0.1 --mind 0.1 --hwe 1e-15 --maf 0.01 \
-        --make-pgen --out plink_${curr_chr}_multi_split_merged_common_anc_${anc} ;\
+        --make-pgen --out plink_${curr_chr}_multi_split_merged_common ;\
 
     # deal with loss of empty columns
     awk 'BEGIN{OFS="\t"} NR==1 {print "#FID", "IID", $2} NR>1 {print "0", $1, $2}' \
-    plink_${curr_chr}_multi_split_merged_common_anc_${anc}.psam > tmp.psam ; \
-    mv tmp.psam plink_${curr_chr}_multi_split_merged_common_anc_${anc}.psam ;\
+    plink_${curr_chr}_multi_split_merged_common.psam > tmp.psam ; \
+    mv tmp.psam plink_${curr_chr}_multi_split_merged_common.psam ;\
 
     # run regenie
     ./regenie_v3.2.8.gz_x86_64_Linux \
         --step 2 \
-        --pgen plink_${curr_chr}_multi_split_merged_common_anc_${anc} \
+        --pgen plink_${curr_chr}_multi_split_merged_common \
         --phenoFile regenie_pheno.txt \
         --covarFile regenie_covar.txt \
         --bt \
@@ -64,8 +64,7 @@ for ((i=1; i<=16; i++)); do \
         --minMAC 100
   done
   rm plink_${curr_chr}_multi_split_merged* ;\
-  rm plink_${curr_chr}_multi_split_merged_common_anc_${anc}* ;\
 done
 
 # backup results
-gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n aou_step2_rg_${curr_chr}_common_anc_all* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results/ ;\
+gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n aou_step2_rg_${curr_chr}_common_anc_* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_anc_strat/
