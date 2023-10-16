@@ -19,13 +19,13 @@ done
 
 ##################################
 
-# run on ancestry stratified data
+# run on ancestry stratified data in home computer directory
 anc="eur"
 for outcome in "${outcomes[@]}" ; do \
   echo "On outcome $outcome"  
-  head -n 1 rg_results_anc_strat/aou_step2_rg_chr1_common_anc_${anc}_${outcome}.regenie > aou_${outcome}_anc_${anc}_gwas.txt ;\
+  head -n 1 aou_step2_rg_chr1_common_anc_${anc}_${outcome}.regenie > aou_${outcome}_anc_${anc}_gwas.txt ;\
   for ((i=1; i<=22; i++)); do \
-    file="rg_results_anc_strat/aou_step2_rg_chr${i}_common_anc_${anc}_${outcome}.regenie" ;\
+    file="aou_step2_rg_chr${i}_common_anc_${anc}_${outcome}.regenie" ;\
     tail -n +2 "$file" >> aou_${outcome}_anc_${anc}_gwas.txt ;\
   done \
 done
