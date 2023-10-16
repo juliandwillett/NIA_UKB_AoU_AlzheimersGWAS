@@ -34,18 +34,18 @@ for ((i=1; i<=16; i++)); do \
     
     # deal with loss of empty columns
     awk 'BEGIN{OFS="\t"} NR==1 {print "#FID", "IID", $2} NR>1 {print "0", $1, $2}' \
-    plink_${curr_chr}_multi_split_merged_common.psam > tmp.psam ; \
-    mv tmp.psam plink_${curr_chr}_multi_split_merged_common.psam
+    plink_${curr_chr}_multi_split_merged_all.psam > tmp.psam ; \
+    mv tmp.psam plink_${curr_chr}_multi_split_merged_all.psam
   
     # run regenie
     ./regenie_v3.2.8.gz_x86_64_Linux \
         --step 2 \
-        --pgen plink_${curr_chr}_multi_split_merged_common \
+        --pgen plink_${curr_chr}_multi_split_merged_all \
         --phenoFile regenie_pheno.txt \
         --covarFile regenie_covar.txt \
         --bt \
         --firth --approx --pThresh 0.01 \
-        --pred step1_files/revised_pred_${anc}.list \
+        --pred aou_step1_rg_array_anc_all_pred.list \
         --bsize 400 \
         --out aou_step2_rg_${curr_chr}_common_anc_all \
         --minMAC 20
