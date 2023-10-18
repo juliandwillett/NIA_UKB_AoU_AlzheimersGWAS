@@ -6,8 +6,8 @@ unzip plink2_linux*
 wget https://github.com/rgcgithub/regenie/releases/download/v3.2.8/regenie_v3.2.8.gz_x86_64_Linux.zip ;\
 unzip regenie_v3.2.8.gz_x86_64_Linux.zip
 
-# get pheno/covar files
-gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_pheno.txt . ;\
+# get pheno/covar files. For any affected relative for AD by proxy, including grandparents (precedence for this in two papers). Use _revised file for solely 1st degree relatives.
+gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_pheno.txt . ;\ 
 gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_covar.txt .
 
 # get step 1 files
