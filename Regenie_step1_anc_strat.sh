@@ -9,8 +9,8 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip
 gsutil -u $GOOGLE_PROJECT -m cp -r gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/array_data_for_regenie_step1/* .
 
 # get pheno/covar files
-gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_pheno.txt .
-gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_covar.txt .
+gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_pheno_revised.txt . #revised has AD by proxy for only 1st degree relatives
+gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_covar_revised.txt . #nonrevised file has AD by proxy for 1st deg relatives and grandparents
 
 # run regenie on individuals of each ancestry
 ancestries=("eur" "afr" "amr" "eas" "sas") # skip mid due to too small sample size then convergence issue with regenie
