@@ -47,6 +47,7 @@ for ((i=1; i<=16; i++)); do \
         --firth --approx --pThresh 0.01 \
         --pred aou_step1_rg_array_anc_all_pred.list \
         --bsize 400 \
+        --phenoColList AD,AD_any \
         --out aou_step2_rg_${curr_chr}_allvar_anc_all \
         --minMAC 20
   done
