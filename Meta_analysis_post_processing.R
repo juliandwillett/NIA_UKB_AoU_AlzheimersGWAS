@@ -33,6 +33,7 @@ df = data.frame(Locus=NA,ID=gw_sig$MarkerName...1,Rsid=NA,ProximalGene=NA,CHROM=
                 Allele0=toupper(gw_sig$Allele2),Allele1=toupper(gw_sig$Allele1),A1Freq=gw_sig$Freq1,
                 Beta=gw_sig$Effect,SE=gw_sig$StdErr,P=gw_sig$`P-value`,Log10P=10^(-gw_sig$`P-value`),
                 HetPVal=gw_sig$HetPVal,NewOld=NA,FAVORAnnot=NA)
+
 for (row in 1:nrow(df)) {
   print(glue("On row {row} of {nrow(df)}"))
   favor_match = which(favor_annot$`Variant (VCF)` == df$ID[[row]])
@@ -43,11 +44,12 @@ for (row in 1:nrow(df)) {
   prox_gene = glue("{favor_row$`Genecode Comprehensive Info`}; {favor_row$`UCSC Info`}")
   favor_sig = ""
   if (!is.na(favor_row$SuperEnhancer)) favor_sig %<>% append("SuperEnhancer; ")
+  if (favor_row$H3K4me3 > 4.5) favor_sig %<>% append(glue("Active H3K4me3 {favor_row$H3K4me3}"))
+  if (favor_row$H3K9me3 > 19) favor_sig %<>% append(glue("Repressed H3K9me3 {favor_row$H3K9me3}"))
   if (favor_row$H3K27me3 > 10) favor_sig %<>% append(glue("Transcription H3K27me3 {favor_row$H3K27me3}"))
   if (favor_row$H3K36me3 > 10) favor_sig %<>% append(glue("Transcription H3K36me3 {favor_row$H3K36me3}"))
-  if (favor_row$totalRNA > 0.45) favor_sig %<>% append(glue("Transcription totalRNA {favor_row$totalRNA}"))
+  if (!is.na(favor_row$totalRNA) & favor_row$totalRNA > 0.45) favor_sig %<>% append(glue("Transcription totalRNA {favor_row$totalRNA}"))
   if (row == 3) break
 }
-# will also want to replace UCSC transcript names with legible gene names
 
 write_xlsx(df, path = "meta_analysis_hits.xlsx")
