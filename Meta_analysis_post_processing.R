@@ -20,7 +20,11 @@ gw_sig = data_qc_sorted %>% filter(`P-value` <= 5e-8) %>%
 mutate(MarkerName...1 = str_replace_all(MarkerName...1,":","-"),MarkerName...1 = str_replace(MarkerName...1,",","-")) # so easily piped into favor
 
 # Produce file for FAVOR batch annotator
-vroom_write(gw_sig %>% select(MarkerName...1),"favor_hits.txt")
+vroom_write(gw_sig %>% select(MarkerName...1),"favor_hits.txt",col_names=F)
 
 # Produce Excel file for writing annotations
-write_xlsx(gw_sig, path = "meta_analysis_hits.xlsx")
+df = data.frame(Locus=NA,ID=gw_sig$MarkerName...1,Rsid=NA,ProximalGene=NA,CHROM=gw_sig$CHR,POS=gw_sig$POS,
+                Allele0=toupper(gw_sig$Allele2),Allele1=toupper(gw_sig$Allele1),A1Freq=gw_sig$Freq1,
+                Beta=gw_sig$Effect,SE=gw_sig$StdErr,P=gw_sig$`P-value`,Log10P=10^(-gw_sig$`P-value`),
+                HetPVal=gw_sig$HetPVal,NewOld=NA,FAVORAnnot=NA)
+write_xlsx(df, path = "meta_analysis_hits.xlsx")
