@@ -44,15 +44,16 @@ for ((i=1; i<=16; i++)); do \
         --covarFile regenie_covar.txt \
         --bt \
         --firth --approx --pThresh 0.01 \
-        --pred aou_step1_rg_array_anc_all_pred.list \
+        --pred revised_pred_${anc}.list \
         --bsize 400 \
         --phenoColList AD,AD_any \
         --out aou_step2_rg_${curr_chr}_allvar_anc_all \
         --minMAC 20
   done
+  gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n aou_step2_rg_${curr_chr}_allvar_anc_* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_all_var_mac_20/
+  gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n *.log gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_all_var_mac_20/
   rm plink_${curr_chr}_multi_split_merged* ;\
 done
 
 # backup results
-gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n aou_step2_rg_${curr_chr}_allvar_anc_* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_all_var_mac_20/
-gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n *.log gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_all_var_mac_20/
+
