@@ -14,7 +14,7 @@ gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae
 gsutil -u $GOOGLE_PROJECT -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie/* .
 
 # rename pred file as needed, ensure second string matches workspace ID.
-awk '{gsub("duplicateofalzheimersgwastake5d1", "duplicateofalzheimersgwastake5", $2)} 1' \
+awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $2)} 1' \
     aou_step1_rg_array_anc_${anc}_pred.list > revised_pred_${anc}.list ;\
 
 
