@@ -11,4 +11,8 @@ aou_ukb_commonvar_meta_analysis.TBL > aou_ukb_commonvar_meta_analysis_IDcolon_ch
 data = vroom("aou_ukb_commonvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL") %>%
 select(-`...17`) %>% rename(CHR = `MarkerName...16`, POS = `...18`)
 data_qc_sorted = data %>% filter(HetPVal > 0.05) %>% arrange(CHR,POS)
-vroom_write(data_qc_sorted,"aou_ukb_commonvar_meta_analysis_het_qc_sorted.txt")
+vroom_write(data_qc_sorted,"aou_ukb_commonvar_meta_analysis_het_qc_sorted.txt") # Locus zoom file
+
+############################
+# Now isolate GW significant hits for annotation
+gw_sig = data_qc_sorted %>% filter(`P-value` <= 5e-8)
