@@ -3,6 +3,7 @@
 
 library(vroom)
 library(tidyverse)
+library(writexl)
 
 # Run this bash command in the terminal, system is too slow
 # awk '{split($1, values, ":"); $(NF+1) = values[1]; $(NF+2) = values[2]; print $0}' \
@@ -15,4 +16,11 @@ vroom_write(data_qc_sorted,"aou_ukb_commonvar_meta_analysis_het_qc_sorted.txt") 
 
 ############################
 # Now isolate GW significant hits for annotation
-gw_sig = data_qc_sorted %>% filter(`P-value` <= 5e-8)
+gw_sig = data_qc_sorted %>% filter(`P-value` <= 5e-8) %>% 
+mutate(MarkerName...1 = str_replace_all(MarkerName...1,":","-"),MarkerName...1 = str_replace(MarkerName...1,",","-")) # so easily piped into favor
+
+# Produce file for FAVOR batch annotator
+vroom_write(gw_sig %>% select(MarkerName...1),"favor_hits.txt")
+
+# Produce Excel file for writing annotations
+write_xlsx(gw_sig, path = "meta_analysis_hits.xlsx")
