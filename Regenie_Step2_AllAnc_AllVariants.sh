@@ -55,3 +55,4 @@ done
 
 # backup results
 gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n aou_step2_rg_${curr_chr}_allvar_anc_* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_all_var_mac_20/
+gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n *.log gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_all_var_mac_20/
