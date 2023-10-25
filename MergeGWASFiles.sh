@@ -43,3 +43,4 @@ for outcome in "${outcomes[@]}" ; do \
     fi  
   done \
 done
+awk 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' aou_${outcome}_anc_all_gwas.txt > aou_${outcome}_anc_all_gwas_ids.txt
