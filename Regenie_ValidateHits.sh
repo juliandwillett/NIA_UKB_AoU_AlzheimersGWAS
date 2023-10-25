@@ -29,7 +29,8 @@ for ((i=1; i<=16; i++)); do \
   gsutil -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/pgen_minimal_qc/plink_${curr_chr}_multi_split* . ;\
   ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
         --geno 0.1 --mind 0.1 --hwe 1e-15 \
-        --make-pgen --out plink_${curr_chr}_multi_split_merged_all
+        --make-pgen --out plink_${curr_chr}_multi_split_merged_all \
+        --set-all-var-ids @:#:\$r,\$a --extract gw_sig_hits.txt
     
     # deal with loss of empty columns
     awk 'BEGIN{OFS="\t"} NR==1 {print "#FID", "IID", $2} NR>1 {print "0", $1, $2}' \
