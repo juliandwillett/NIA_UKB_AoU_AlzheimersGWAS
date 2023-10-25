@@ -43,4 +43,7 @@ for outcome in "${outcomes[@]}" ; do \
     fi  
   done \
 done
-awk 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' aou_${outcome}_anc_all_gwas.txt > aou_${outcome}_anc_all_gwas_ids.txt
+mv aou_AD_min_anc_all_gwas.txt aou_AD_anc_all_gwas.txt
+mv aou_AD_any_min_anc_all_gwas.txt aou_AD_any_anc_all_gwas.txt
+awk 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' aou_AD_anc_all_gwas.txt > aou_AD_anc_all_gwas_ids.txt
+awk 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' aou_AD_any_anc_all_gwas.txt > aou_AD_any_anc_all_gwas_ids.txt
