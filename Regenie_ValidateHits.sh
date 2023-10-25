@@ -1,6 +1,7 @@
 #########################
 # Get significant hits from individual cohorts and make ID file. Run in R:
-# gwas_sig = gwas %>% filter(LOG10P >= -log10(5e-8))
+# gwas_sig = gwas %>% filter(LOG10P >= -log10(5e-8)) %>%
+#   mutate(ID = glue("{CHROM}:{GENPOS}:{ALLELE0},{ALLELE1}"))
 # vroom_write(gwas_sig %>% select(ID),"aou_AD_any_all_variant_anc_all_gw_hits.txt")
 
 ######################################
