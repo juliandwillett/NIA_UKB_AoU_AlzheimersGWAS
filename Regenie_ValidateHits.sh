@@ -1,3 +1,10 @@
+#########################
+# Get significant hits from individual cohorts and make ID file. Run in R:
+# gwas_sig = gwas %>% filter(LOG10P >= -log10(5e-8))
+# vroom_write(gwas_sig %>% select(ID),"aou_AD_any_all_variant_anc_all_gw_hits.txt")
+
+######################################
+
 # get plink2
 wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\ 
 unzip plink2_linux_avx2_20221024.zip
