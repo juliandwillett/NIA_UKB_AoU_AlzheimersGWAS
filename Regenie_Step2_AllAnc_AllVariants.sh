@@ -1,6 +1,6 @@
 # get plink2
 wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\ 
-unzip plink2_linux*
+unzip plink2_linux_avx2_20221024.zip
 
 # get regenie
 wget https://github.com/rgcgithub/regenie/releases/download/v3.2.8/regenie_v3.2.8.gz_x86_64_Linux.zip ;\
