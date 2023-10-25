@@ -33,11 +33,13 @@ done
 #################################
 # Merge files on other computer, exporting chromosomes broken into parts due to large size
 # cd gwas_file_folder
-outcomes=("AD" "AD_any")
+outcomes=("AD_min" "AD_any_min")
 for outcome in "${outcomes[@]}" ; do \
   echo "On outcome $outcome"
   head -n 1 aou_step2_rg_chr1_allvar_anc_all_AD_any_min20N_A.regenie > aou_${outcome}_anc_all_gwas.txt ;\
   for file in *.regenie; do \
-    tail -n +2 "$file" >> aou_${outcome}_anc_all_gwas.txt ;\
+    if [[ $file == *$outcome* ]]; then
+      tail -n +2 "$file" >> aou_${outcome}_anc_all_gwas.txt
+    fi  
   done \
 done
