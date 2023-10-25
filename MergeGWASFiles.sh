@@ -29,3 +29,15 @@ for outcome in "${outcomes[@]}" ; do \
     tail -n +2 "$file" >> aou_${outcome}_anc_${anc}_gwas.txt ;\
   done \
 done
+
+#################################
+# Merge files on other computer, exporting chromosomes broken into parts due to large size
+# cd gwas_file_folder
+outcomes=("AD" "AD_any")
+for outcome in "${outcomes[@]}" ; do \
+  echo "On outcome $outcome"
+  head -n 1 aou_step2_rg_chr1_allvar_anc_all_AD_any_min20N_A.regenie > aou_${outcome}_anc_all_gwas.txt ;\
+  for file in *.regenie; do \
+    tail -n +2 "$file" >> aou_${outcome}_anc_all_gwas.txt ;\
+  done \
+done
