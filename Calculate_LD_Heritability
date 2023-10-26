@@ -31,12 +31,13 @@ gsutil -m cp -r -n ../arrays_autosomes_post_qc_ld* gs://fc-secure-4029af59-df13-
 ### Next get independent loci using GCTA COJO. Requires uploading summary stats for common variants. Requires processing GWAS data:
 ## Rcode:
 # gwas_common = vroom("aou_AD_any_anc_all_gwas_common_variants_tsv.txt")
-# ma_file = gwas_common %>% mutate(ID = glue("{CHROM}:{GENPOS}:{ALLELE0},{ALLELE1}")) %>%
+# ma_file = gwas_common %>% mutate(ID = glue("chr{CHROM}:{GENPOS}:{ALLELE0}:{ALLELE1}")) %>%
 #     select(ID,ALLELE1,ALLELE0,A1FREQ,BETA,SE,LOG10P,N) %>% rename(P=LOG10P) %>% mutate(P=10^(-1 * P))
 # vroom_write(ma_file,"ad_any_gwas_common.ma")
 
-## Bash code after uploading this MA file
-./gcta-1.94.1  --bfile ../arrays_autosomes_post_qc --chr 1 --maf 0.01 --cojo-file ../ad_any_gwas_common.ma --cojo-slct --out test_chr1
+## Bash code after uploading this MA file. Most SNPs from array data present in common gwas
+./gcta-1.94.1  --bfile ../arrays_autosomes_post_qc --chr 1 --maf 0.01 --cojo-file ../ad_any_gwas_common.ma --cojo-slct \
+  --cojo-wind 1000 --out array_cojo_chr1
 
 
 
