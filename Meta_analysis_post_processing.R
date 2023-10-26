@@ -11,6 +11,9 @@ library(magrittr)
 # awk '{split($1, values, ":"); $(NF+1) = values[1]; $(NF+2) = values[2]; print $0}' \
 # aou_ukb_commonvar_meta_analysis.TBL > aou_ukb_commonvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL
 
+# Compress it so it can ideally be piped into locus zoom
+# gzip -9 aou_ukb_all_variants_meta_analysis_IDcolon_chrposrefalt_cols.TBL
+
 #data = vroom("aou_ukb_commonvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL") %>%
 #  select(-`...17`) %>% rename(CHR = `MarkerName...16`, POS = `...18`)
 #data_qc_sorted = data %>% filter(HetPVal > 0.05) %>% arrange(CHR,POS)
