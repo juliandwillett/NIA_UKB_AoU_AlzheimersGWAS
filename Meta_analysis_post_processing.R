@@ -14,15 +14,15 @@ library(magrittr)
 # Compress it so it can ideally be piped into locus zoom
 # gzip -9 aou_ukb_all_variants_meta_analysis_IDcolon_chrposrefalt_cols.TBL
 
-#data = vroom("aou_ukb_commonvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL") %>%
-#  select(-`...17`,-Direction,-HetISq,-HetChiSq) %>% rename(CHR = `MarkerName...16`, POS = `...18`)
-#data_qc_sorted = data %>% filter(HetPVal > 0.05) %>% arrange(CHR,POS)
-#vroom_write(data_qc_sorted,"aou_ukb_commonvar_meta_analysis_het_qc_sorted.txt") # Locus zoom file
+data = vroom("aou_ukb_commonvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL") %>%
+  select(-`...17`,-Direction,-HetISq,-HetChiSq) %>% rename(CHR = `MarkerName...16`, POS = `...18`)
+data_qc_sorted = data %>% filter(HetPVal > 0.05) %>% arrange(CHR,POS)
+vroom_write(data_qc_sorted,"aou_ukb_commonvar_meta_analysis_het_qc_sorted.txt") # Locus zoom file
 
 ############################
 # Now isolate GW significant hits for annotation
-#gw_sig = data_qc_sorted %>% filter(`P-value` <= 5e-8) %>% 
-  #mutate(MarkerName...1 = str_replace_all(MarkerName...1,":","-"),MarkerName...1 = str_replace(MarkerName...1,",","-")) # so easily piped into favor
+gw_sig = data_qc_sorted %>% filter(`P-value` <= 5e-8) %>% 
+  mutate(MarkerName...1 = str_replace_all(MarkerName...1,":","-"),MarkerName...1 = str_replace(MarkerName...1,",","-")) # so easily piped into favor
 gw_sig = vroom("aou_ukb_commonvar_meta_analysis_het_qc_sorted.txt") %>% filter(`P-value` <= 5e-8) %>% 
   mutate(MarkerName = str_replace_all(MarkerName,":","-"),MarkerName = str_replace(MarkerName,",","-")) # so easily piped into favor
 
