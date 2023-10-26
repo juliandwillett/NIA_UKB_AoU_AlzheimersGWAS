@@ -37,7 +37,7 @@ gsutil -m cp -r -n ../arrays_autosomes_post_qc_ld* gs://fc-secure-4029af59-df13-
 
 ## Bash code after uploading this MA file. Most SNPs from array data present in common gwas
 ./gcta-1.94.1  --bfile ../arrays_autosomes_post_qc --chr 1 --maf 0.01 --cojo-file ../ad_any_gwas_common.ma --cojo-slct \
-  --cojo-wind 1000 --out array_cojo_chr1
+  --cojo-wind 500 --out array_cojo_chr1
 
 
 
