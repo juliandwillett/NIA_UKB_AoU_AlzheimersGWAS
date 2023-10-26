@@ -45,8 +45,8 @@ for ((i=1; i<=16; i++)); do \
     
     # deal with loss of empty columns
     awk 'BEGIN{OFS="\t"} NR==1 {print "#FID", "IID", $2} NR>1 {print "0", $1, $2}' \
-    plink_${curr_chr}_multi_split_merged_all.psam > tmp.psam ; \
-    mv tmp.psam plink_${curr_chr}_multi_split_merged_all.psam
+    plink_${curr_chr}_multi_split_merged_gw_hits.psam > tmp.psam ; \
+    mv tmp.psam plink_${curr_chr}_multi_split_merged_gw_hits.psam
   
     # run regenie
     ./regenie_v3.2.8.gz_x86_64_Linux \
@@ -59,11 +59,9 @@ for ((i=1; i<=16; i++)); do \
         --pred revised_pred_${anc}.list \
         --bsize 400 \
         --phenoColList AD,AD_any \
-        --out aou_step2_rg_${curr_chr}_allvar_anc_all \
-        --minMAC 20 --mcc \
-        --extract aou_AD_any_all_variant_anc_all_gw_hits.txt
+        --out aou_step2_rg_${curr_chr}_gw_hits_anc_all \
+        --minMAC 20 --mcc 
   done
-  gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n aou_step2_rg_${curr_chr}_allvar_anc_* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_all_var_mac_20/ ;\
-  gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n *.log gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_all_var_mac_20/ ;\
+  gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n aou_step2_rg_* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_gw_hits/ ;\
   rm plink_${curr_chr}_multi_split* ;\
 done
