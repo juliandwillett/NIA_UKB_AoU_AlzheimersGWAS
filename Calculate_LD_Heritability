@@ -1,1 +1,42 @@
+### Get GCTA, which has COJO software
+wget https://yanglab.westlake.edu.cn/software/gcta/bin/gcta-1.94.1-linux-kernel-3-x86_64.zip
+unzip gcta-1.94.1-linux-kernel-3-x86_64.zip
+
+### Pull and process array data:
+# Get plink
+wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\
+unzip plink2_linux_avx2_20221024.zip
+
+# Get array data
+gsutil -u $GOOGLE_PROJECT -m cp -r gs://fc-secure-f509fd3c-7cd4-49e0-b409-fc98ab38bb4f/data/array_data_pgen_files/arrays_allchr* .
+
+# Get pheno data, so only those individuals in our srWGS cohort are included
+gsutil -m cp -r -n gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/regenie_pheno.txt .
+awk '{print $1 "\t" $2}' regenie_pheno.txt > ids.txt
+
+# Process data:
+./plink2 \
+  --pfile arrays_allchr \
+  --maf 0.01 --mac 40 --geno 0.1 --hwe 1e-15 \
+  --mind 0.1 --chr 1-22 --keep ids.txt \ 
+  --make-bed \
+  --out arrays_autosomes_post_qc
+
+### Get LD scores. GCTA command took 30 minutes using 8 cores.
+cd gcta-1.94.1-linux-kernel-3-x86_64
+./gcta-1.94.1 --bfile ../arrays_autosomes_post_qc --ld-score --ld-wind 1000 \
+--ld-rsq-cutoff 0.01 --out ../arrays_autosomes_post_qc_ld --thread-num 8
+gsutil -m cp -r -n ../arrays_autosomes_post_qc_ld* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/ld_array_anc_all/ 
+
+### Next get independent loci using GCTA COJO. Requires uploading summary stats for common variants. Requires processing GWAS data:
+## Rcode:
+# gwas_common = vroom("aou_AD_any_anc_all_gwas_common_variants_tsv.txt")
+# ma_file = gwas_common %>% mutate(ID = glue("{CHROM}:{GENPOS}:{ALLELE0},{ALLELE1}")) %>%
+#     select(ID,ALLELE1,ALLELE0,A1FREQ,BETA,SE,LOG10P,N) %>% rename(P=LOG10P) %>% mutate(P=10^(-1 * P))
+# vroom_write(ma_file,"ad_any_gwas_common.ma")
+
+## Bash code after uploading this MA file
+./gcta-1.94.1  --bfile ../arrays_autosomes_post_qc --chr 1 --maf 0.01 --cojo-file ../ad_any_gwas_common.ma --cojo-slct --out test_chr1
+
+
 
