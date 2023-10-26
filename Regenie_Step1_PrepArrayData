@@ -1,1 +1,14 @@
+# Get plink
+wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\
+unzip plink2_linux_avx2_20221024.zip
 
+# Get array data
+gsutil -u $GOOGLE_PROJECT -m cp -r gs://fc-secure-f509fd3c-7cd4-49e0-b409-fc98ab38bb4f/data/array_data_pgen_files/arrays_allchr* .
+
+# Process data:
+./plink2 \
+  --pfile arrays_allchr \
+  --maf 0.01 --mac 40 --geno 0.1 --hwe 1e-15 \
+  --mind 0.1 --chr 1-22 \ 
+  --make-pgen \
+  --out arrays_autosomes_post_qc
