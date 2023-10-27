@@ -65,3 +65,12 @@ for ((i=1; i<=16; i++)); do \
   gsutil -o GSUtil:parallel_composite_upload_threshold=104857600 -m cp -r -n aou_step2_rg_* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_gw_hits/ ;\
   rm plink_${curr_chr}_* ;\
 done
+
+###
+# Merge results for export and analysis
+head -n 1 aou_step2_rg_chr16_gw_hits_anc_all_AD_any.regenie > aou_AD_any_anc_all_gwas_mcc.txt
+for ((i=1; i<=22; i++)); do \
+    file="aou_step2_rg_chr${i}_gw_hits_anc_all_AD_any.regenie" ;\
+    tail -n +2 "$file" >> aou_AD_any_anc_all_gwas_mcc.txt ;\
+done
+gsutil cp -rn aou_AD_any_anc_all_gwas_mcc.txt gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/rg_results_all_anc_gw_hits/
