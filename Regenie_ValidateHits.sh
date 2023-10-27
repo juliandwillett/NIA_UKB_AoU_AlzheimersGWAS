@@ -58,7 +58,7 @@ for ((i=1; i<=16; i++)); do \
         --firth --approx --pThresh 0.01 \
         --pred revised_pred_${anc}.list \
         --bsize 400 \
-        --phenoColList AD,AD_any \
+        --phenoColList AD_any \
         --out aou_step2_rg_${curr_chr}_gw_hits_anc_all \
         --minMAC 20 --mcc 
   done
