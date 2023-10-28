@@ -39,5 +39,25 @@ gsutil -m cp -r -n ../arrays_autosomes_post_qc_ld* gs://fc-secure-4029af59-df13-
 ./gcta-1.94.1  --bfile ../arrays_autosomes_post_qc --chr 1 --maf 0.01 --cojo-file ../ad_any_gwas_common.ma --cojo-slct \
   --cojo-wind 500 --cojo-p 1e-5 --cojo-collinear 0.99 --out array_cojo_chr1 
 
+## Get heritability using guide:
+./gcta-1.94.1 --bfile ../arrays_autosomes_post_qc --ld-score-region 200 \
+    --thread-num 8 --out array_auto_ld # output array_auto_ld.score.ld
 
+
+### Now run LDSC using the computed LD values. Run on FASRC
+git clone https://github.com/bulik/ldsc.git
+cd ldsc
+mamba activate ldsc
+
+python munge_sumstats.py \
+--sumstats /n/home09/jwillett/true_lab_storage/00_AoU/ad_any_gwas_common.ma \
+--snp ID --N-col N --a1 ALLELE1 --a2 ALLELE0 --p P --frq A1FREQ --a1-inc \
+--out /n/home09/jwillett/true_lab_storage/00_AoU/munged_ad_any 
+
+# LD Score Regression
+python ldsc.py \
+--h2 /n/home09/jwillett/true_lab_storage/00_AoU/munged_ad_any.sumstats.gz \
+--ref-ld /n/home09/jwillett/true_lab_storage/00_AoU/arrays_autosomes_post_qc_ld.score.ld \
+--w-ld /n/home09/jwillett/true_lab_storage/00_AoU/arrays_autosomes_post_qc_ld.score.ld \
+--out /n/home09/jwillett/true_lab_storage/00_AoU/ad_any_herit_aou
 
