@@ -42,7 +42,7 @@ git clone https://github.com/bulik/ldsc.git
 cd ldsc
 module load python/3.10.12-fasrc01
 mamba activate ldsc
-wget https://zenodo.org/records/8182036/files/eur_w_ld_chr.tar.gz?download=1
+wget https://zenodo.org/records/8182036/files/eur_w_ld_chr.tar.gz?download=1 # GRCh37
 mv 'eur_w_ld_chr.tar.gz?download=1' eur_w_ld_chr.tar.gz
 
 # LD files have ID reported as RSID, so have to mutate these to be CHR:POS
