@@ -29,11 +29,22 @@ cd gcta-1.94.1-linux-kernel-3-x86_64
 gsutil -m cp -r -n ../arrays_autosomes_post_qc_ld* gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67/data/ld_array_anc_all/ 
 
 ### Next get independent loci using GCTA COJO. Requires uploading summary stats for common variants. Requires processing GWAS data:
+# to make this work, need to use Ensembl to convert the MA file from GRCh38 to GRCh37 (which the LD data is in), using UCSC liftover
 ## Rcode:
-# gwas_common = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/aou_AD_any_anc_all_gwas_common_variants_tsv.txt")
-# ma_file = gwas_common %>% mutate(ID = glue("chr{CHROM}:{GENPOS}")) %>%
-#     select(ID,ALLELE1,ALLELE0,A1FREQ,BETA,SE,LOG10P,N) %>% rename(P=LOG10P) %>% mutate(P=10^(-1 * P))
-# vroom_write(ma_file,"aou_ad_any_anc_all_commonvar.ma")
+gwas_common = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/aou_AD_any_anc_all_gwas_common_variants_tsv.txt")
+bed_file = gwas_common %>% select(CHROM,GENPOS) %>% mutate(ENDPOS=GENPOS) %>%
+  mutate(CHROM = paste0("chr",CHROM))
+vroom_write(bed_file,"aou_ad_any_anc_all_commonvar_forstepdown_ucsc.bed") # pipe this through
+
+# now read in this data
+bed_grch37 = vroom("/n/home09/jwillett/true_lab_storage/00_AoU/aou_ad_any_anc_all_commonvar_ucsc_grch37.bed",col_names=F)
+bed_grch37_withgrch38 = bed_grch37 %>% mutate(GENPOS = sub(".*-", "", X4)) %>% rename(POS37=X2) %>%
+    mutate(CHRPOS = paste0(X1,":",GENPOS)) %>% select(CHRPOS,POS37)
+gwas_common_with_grch37 = merge(gwas_common %>% mutate(CHRPOS = paste0("chr",CHROM,":",GENPOS)),bed_grch37_withgrch38,by="CHRPOS") %>%
+    arrange(CHROM,GENPOS) %>% unique()
+ma_file = gwas_common_with_grch37_nodup %>% mutate(ID = glue("{CHROM}:{POS37}")) %>%
+  select(ID,ALLELE1,ALLELE0,A1FREQ,BETA,SE,LOG10P,N) %>% rename(P=LOG10P) %>% mutate(P=10^(-1 * P))
+vroom_write(ma_file,"aou_ad_any_anc_all_commonvar.ma")
 
 ######################
 ### GCTA does not work well, so use LDSC on summary stats
@@ -45,16 +56,16 @@ mamba activate ldsc
 wget https://zenodo.org/records/8182036/files/eur_w_ld_chr.tar.gz?download=1 # GRCh37
 mv 'eur_w_ld_chr.tar.gz?download=1' eur_w_ld_chr.tar.gz
 
-# LD files have ID reported as RSID, so have to mutate these to be CHR:POS
-mkdir /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/
-rm /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/*
-for ((i=1; i<=22; i++)); do
-  zcat /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr/${i}.l2.ldscore.gz | \
-    awk 'NR > 1 {$2 = $1 ":" $3}1' > /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/${i}.l2.ldscore
-  gzip /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/${i}.l2.ldscore
-  cp /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr/${i}.l2.M_5_50 \
-    /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/
-done
+# LD files have ID reported as RSID, so have to mutate these to be CHR:POS. Run this in R.
+dir.create("/n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr_chrpos_ids/")
+file.remove(list.files("/n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr_chrpos_ids/"))
+for (i in 1:22) {
+    print(i)
+    ld_val = vroom(glue("/n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr/{i}.l2.ldscore.gz")) %>% mutate(SNP = glue("{CHR}:{BP}"))
+    vroom_write(ld_val,glue("/n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr_chrpos_ids/{i}.l2.ldscore"))
+    file.copy("/n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr/{i}.l2.M_5_50",
+      "/n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr_chrpos_ids/{i}.l2.M_5_50")
+}
 
 python munge_sumstats.py \
 --sumstats /n/home09/jwillett/true_lab_storage/00_AoU/aou_ad_any_anc_all_commonvar.ma \
@@ -64,7 +75,7 @@ python munge_sumstats.py \
 # LD Score Regression
 python ldsc.py \
 --h2 /n/home09/jwillett/true_lab_storage/00_AoU/munged_ad_any.sumstats.gz \
---ref-ld-chr /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/ \
---w-ld-chr /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/ \
+--ref-ld-chr /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr_chrpos_ids/ \
+--w-ld-chr /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr_chrpos_ids/ \
 --out /n/home09/jwillett/true_lab_storage/00_AoU/ad_any_herit_aou
 
