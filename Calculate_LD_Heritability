@@ -30,52 +30,10 @@ gsutil -m cp -r -n ../arrays_autosomes_post_qc_ld* gs://fc-secure-4029af59-df13-
 
 ### Next get independent loci using GCTA COJO. Requires uploading summary stats for common variants. Requires processing GWAS data:
 ## Rcode:
-# gwas_common = vroom("aou_AD_any_anc_all_gwas_common_variants_tsv.txt")
-# ma_file = gwas_common %>% mutate(ID = glue("chr{CHROM}:{GENPOS}:{ALLELE0}:{ALLELE1}")) %>%
+# gwas_common = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/aou_AD_any_anc_all_gwas_common_variants_tsv.txt")
+# ma_file = gwas_common %>% mutate(ID = glue("chr{CHROM}:{GENPOS}")) %>%
 #     select(ID,ALLELE1,ALLELE0,A1FREQ,BETA,SE,LOG10P,N) %>% rename(P=LOG10P) %>% mutate(P=10^(-1 * P))
-# vroom_write(ma_file,"ad_any_gwas_common.ma")
-
-## Bash code after uploading this MA file. Most SNPs from array data present in common gwas
-./gcta-1.94.1  --bfile ../arrays_autosomes_post_qc --chr 1 --maf 0.01 --cojo-file ../ad_any_gwas_common.ma --cojo-slct \
-  --cojo-wind 500 --cojo-p 1e-5 --cojo-collinear 0.99 --out array_cojo_chr1 
-
-## Get heritability using guide:
-./gcta-1.94.1 --bfile ../arrays_autosomes_post_qc --ld-score-region 200 \
-    --thread-num 8 --out array_auto_ld # output: ldsc/array_auto_ld.score.ld
-# R code:
-lds_seg = read.table("array_auto_ld.score.ld",header=T,colClasses=c("character",rep("numeric",8)))
-quartiles=summary(lds_seg$ldscore_SNP)
-
-lb1 = which(lds_seg$ldscore_SNP <= quartiles[2])
-lb2 = which(lds_seg$ldscore_SNP > quartiles[2] & lds_seg$ldscore_SNP <= quartiles[3])
-lb3 = which(lds_seg$ldscore_SNP > quartiles[3] & lds_seg$ldscore_SNP <= quartiles[5])
-lb4 = which(lds_seg$ldscore_SNP > quartiles[5])
-
-lb1_snp = lds_seg$SNP[lb1]
-lb2_snp = lds_seg$SNP[lb2]
-lb3_snp = lds_seg$SNP[lb3]
-lb4_snp = lds_seg$SNP[lb4]
-
-write.table(lb1_snp, "snp_group1.txt", row.names=F, quote=F, col.names=F)
-write.table(lb2_snp, "snp_group2.txt", row.names=F, quote=F, col.names=F)
-write.table(lb3_snp, "snp_group3.txt", row.names=F, quote=F, col.names=F)
-write.table(lb4_snp, "snp_group4.txt", row.names=F, quote=F, col.names=F)
-
-# bash
-./gcta-1.94.1 --bfile ../arrays_autosomes_post_qc --extract snp_group1.txt --make-grm --out test_group1 --thread-num 8
-./gcta-1.94.1 --bfile ../arrays_autosomes_post_qc --extract snp_group2.txt --make-grm --out test_group2 --thread-num 8
-./gcta-1.94.1 --bfile ../arrays_autosomes_post_qc --extract snp_group3.txt --make-grm --out test_group3 --thread-num 8
-./gcta-1.94.1 --bfile ../arrays_autosomes_post_qc --extract snp_group4.txt --make-grm --out test_group4 --thread-num 8
-printf "test_group1\ntest_group2\ntest_group3\ntest_group4" > multi_GRMs.txt
-
-# must make pheno file, guide here: https://www.biostars.org/p/348026/
-awk 'NR>1 {print $1 "\t" $2 "\t" $6}' ../regenie_pheno.txt > grm_phen.phen
-./gcta-1.94.1 --bfile ../arrays_autosomes_post_qc --maf 0.01 --make-grm --out test --thread-num 8
-
-
-
-gcta64 --grm test --pheno test_cc.phen --reml --prevalence 0.01 --out test --thread-num 10
-./gcta-1.94.1 --reml --mgrm multi_GRMs.txt --pheno phen.txt --out test
+# vroom_write(ma_file,"aou_ad_any_anc_all_commonvar.ma")
 
 ######################
 ### GCTA does not work well, so use LDSC on summary stats
@@ -87,15 +45,26 @@ mamba activate ldsc
 wget https://zenodo.org/records/8182036/files/eur_w_ld_chr.tar.gz?download=1
 mv 'eur_w_ld_chr.tar.gz?download=1' eur_w_ld_chr.tar.gz
 
+# LD files have ID reported as RSID, so have to mutate these to be CHR:POS
+mkdir /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/
+rm /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/*
+for ((i=1; i<=22; i++)); do
+  zcat /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr/${i}.l2.ldscore.gz | \
+    awk 'NR > 1 {$2 = $1 ":" $3}1' > /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/${i}.l2.ldscore
+  gzip /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/${i}.l2.ldscore
+  cp /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr/${i}.l2.M_5_50 \
+    /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/
+done
+
 python munge_sumstats.py \
---sumstats /n/home09/jwillett/true_lab_storage/00_AoU/ad_any_gwas_common.ma \
+--sumstats /n/home09/jwillett/true_lab_storage/00_AoU/aou_ad_any_anc_all_commonvar.ma \
 --snp ID --N-col N --a1 ALLELE1 --a2 ALLELE0 --p P --frq A1FREQ --a1-inc \
 --out /n/home09/jwillett/true_lab_storage/00_AoU/munged_ad_any 
 
 # LD Score Regression
 python ldsc.py \
 --h2 /n/home09/jwillett/true_lab_storage/00_AoU/munged_ad_any.sumstats.gz \
---ref-ld /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr \
---w-ld /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr \
+--ref-ld-chr /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/ \
+--w-ld-chr /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref/eur_w_ld_chr_chrpos_ids/ \
 --out /n/home09/jwillett/true_lab_storage/00_AoU/ad_any_herit_aou
 
