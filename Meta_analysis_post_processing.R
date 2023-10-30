@@ -16,7 +16,7 @@ library(magrittr)
 
 data = vroom("aou_ukb_commonvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL") %>%
   select(-`...17`,-Direction,-HetISq,-HetChiSq) %>% rename(CHR = `MarkerName...16`, POS = `...18`)
-data_qc_sorted = data %>% filter(HetPVal > 0.05) %>% arrange(CHR,POS)
+data_qc_sorted = data %>% filter(HetPVal > 5e-8, (MaxFreq - MinFreq) < 0.4) %>% arrange(CHR,POS) # QC done per rec's of Bellenguez et al 2022
 vroom_write(data_qc_sorted,"aou_ukb_commonvar_meta_analysis_het_qc_sorted.txt") # Locus zoom file
 
 ############################
