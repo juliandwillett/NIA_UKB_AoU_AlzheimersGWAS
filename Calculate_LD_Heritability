@@ -31,6 +31,11 @@ gsutil -m cp -r -n ../arrays_autosomes_post_qc_ld* gs://fc-secure-4029af59-df13-
 ### Next get independent loci using GCTA COJO. Requires uploading summary stats for common variants. Requires processing GWAS data:
 # to make this work, need to use Ensembl to convert the MA file from GRCh38 to GRCh37 (which the LD data is in), using UCSC liftover
 ## Rcode:
+
+
+
+###################################
+# Heritability calculation
 gwas_common = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/aou_AD_any_anc_all_gwas_common_variants_tsv.txt")
 bed_file = gwas_common %>% select(CHROM,GENPOS) %>% mutate(ENDPOS=GENPOS) %>%
   mutate(CHROM = paste0("chr",CHROM))
