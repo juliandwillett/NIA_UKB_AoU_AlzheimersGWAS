@@ -1,4 +1,6 @@
-gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr19* .
+#CHR done: 19
+
+gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr19_split_merged.p* .
 mkdir region_files
 
 R:
