@@ -4,6 +4,7 @@ gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr19_split_merged
 mkdir region_files
 
 R:
+    # while we are focusing on identifying independent loci per the meta analysis, we use the single GWAS results here
     df = vroom("aou_AD_any_anc_all_forclumping.txt") # file for individual cohort GWAS with p vals < 1e-5
     df = df %>% mutate(P = 10^(-LOG10P),SNP = glue("{CHROM}-{GENPOS}-{ALLELE0}-{ALLELE1}")) %>%
         filter(P <= 1e-5)
