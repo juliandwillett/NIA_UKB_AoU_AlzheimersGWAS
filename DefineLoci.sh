@@ -5,7 +5,8 @@ mkdir region_files
 
 R:
     df = vroom("aou_AD_any_anc_all_forclumping.txt") # file for individual cohort GWAS with p vals < 1e-5
-    df = df %>% mutate(P = 10^(-LOG10P),SNP = glue("{CHROM}-{GENPOS}-{ALLELE0}-{ALLELE1}"))
+    df = df %>% mutate(P = 10^(-LOG10P),SNP = glue("{CHROM}-{GENPOS}-{ALLELE0}-{ALLELE1}")) %>%
+        filter(P <= 1e-5)
     vroom_write(df,"aou_AD_any_anc_all_forclumping_colsnamed.txt")
 
     out_df = df %>% mutate(Region = NA, RegOrigin = NA)
