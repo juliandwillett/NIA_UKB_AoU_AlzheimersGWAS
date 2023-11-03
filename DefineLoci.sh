@@ -47,3 +47,14 @@ for ((i=1208;i<=1241;i++); do
 plink --bfile plink_chr19_multi_split --clump region_files/region_${i}.txt \
     --clump-kb 500 --clump-r2 0.001 --clump-p1 1e-5 --clump-p2 1e-5 --out region_files/region_${i}_clumped
 done
+
+####
+# If instead using GCTA COJO:
+R 
+ma_file = df %>% mutate(ID = glue("{CHROM}-{GENPOS}-{ALLELE0}-{ALLELE1}")) %>%
+     select(ID,ALLELE1,ALLELE0,A1FREQ,BETA,SE,P,N)
+head(ma_file)
+vroom_write(ma_file,"test.ma")
+
+BASH
+./gcta*  --bfile ../plink_chr1_multi_split --chr 1 --cojo-file ../test.ma --cojo-cond ../first_variant.txt --out test1 --cojo-collinear 0.01 --maf 0.01
