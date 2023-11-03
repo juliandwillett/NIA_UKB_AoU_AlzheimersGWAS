@@ -38,10 +38,12 @@ mv tmp plink_chr19_multi_split.pvar
 
 awk 'NR>1 {print $16}' aou_AD_any_anc_all_forclumping_colsnamed.txt > variant_ids.txt
 
-plink2 --pfile plink_chr19_multi_split --geno 0.1 --mind 0.1 --hwe 1e-15 --make-bed --out plink_chr19_multi_split \
+plink2 --pfile plink_chr19_multi_split --make-bed --out plink_chr19_multi_split \ # no QC because aiming to get LD of all variants
     --extract variant_ids.txt 
 
 for ((i=1208;i<=1241;i++); do
+#plink --bfile plink_chr1_multi_split --clump region_files/region_2.txt --out tmp_region2 \
+#    --clump-allow-overlap  --clump-kb 15000 --clump-r2 0.001 --clump-p1 5e-8 --clump-p2 5e-8
 plink --bfile plink_chr19_multi_split --clump region_files/region_${i}.txt \
     --clump-kb 500 --clump-r2 0.001 --clump-p1 1e-5 --clump-p2 1e-5 --out region_files/region_${i}_clumped
 done
