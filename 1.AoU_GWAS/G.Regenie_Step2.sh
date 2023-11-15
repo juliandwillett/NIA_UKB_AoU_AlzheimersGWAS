@@ -6,7 +6,7 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip
 
 # Get files for current chromosome
 curr_chr="chr19"
-gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr19_* .
+gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_${curr_chr}_* .
 
 # Do QC, if it has not been run already
 ./plink2 --pfile plink_${curr_chr}_multi_split \
