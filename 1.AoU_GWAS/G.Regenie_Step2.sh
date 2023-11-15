@@ -29,11 +29,11 @@ gsutil -m cp -rn $WORKSPACE_BUCKET/data/regenie/* .
     --covarFile regenie_covar_revised.txt \
     --bt --mcc --firth-se \
     --firth --approx --pThresh 0.01 \
-    --pred revised_20pcs_pred_sexcovar.list \
+    --pred aou_step1_rg_array_anc_all_pred.list \
     --bsize 400 \
     --out aou_step2_rg_${curr_chr}_firthallvariants \
     --minMAC 20 \
     --phenoCol AD_any
 
 # Backup results
-gsutil -m cp -rn aou_step2_rg_${curr_chr}_firthallvariants $WORKSPACE_BUCKET/data/rg_results/
+gsutil -m cp -rn aou_step2_rg_${curr_chr}_firthallvariants $WORKSPACE_BUCKET/data/rg_results_mcc/
