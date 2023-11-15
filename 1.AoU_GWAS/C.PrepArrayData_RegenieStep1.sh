@@ -6,7 +6,7 @@ gsutil -u $GOOGLE_PROJECT -m cp -r $WORKSPACE_BUCKET/data/array_data_pgen_files/
 ./plink2 \
   --pfile arrays_allchr \
   --maf 0.01 --mac 100 --geno 0.01 --hwe 1e-15 \
-  --mind 0.95 \ #QC implemented in Hail for Hail-level data
+  --mind 0.05 \ #QC implemented in Hail for Hail-level data
   --make-pgen --chr 1-22 \
   --out arrays_autosomes_post_qc \
   --indep-pairwise 100kb 1 0.1
