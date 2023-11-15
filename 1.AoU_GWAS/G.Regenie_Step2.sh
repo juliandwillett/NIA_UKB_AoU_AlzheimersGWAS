@@ -14,7 +14,7 @@ gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr19_* .
         --make-pgen --out plink_${curr_chr}_allvar_anc_all
 
 # revise psam file given the empty column being dropped
-awk 'NR==1 {print "FID\tIID"} NR>1 {print "0\t" $1}' plink_chr19_allvar_anc_all.psam > tmp
+awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" $2}' plink_chr19_allvar_anc_all.psam > tmp
 mv tmp plink_${curr_chr}_allvar_anc_all.psam
 
 # Get files for pheno/covar/step1
