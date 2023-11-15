@@ -10,6 +10,7 @@ gsutil -u $GOOGLE_PROJECT -m cp -r $WORKSPACE_BUCKET/data/array_data_pgen_files/
   --make-pgen --chr 1-22 \
   --out arrays_autosomes_post_qc \
   --indep-pairwise 100kb 1 0.1
+  
   ./plink2 --pfile arrays_autosomes_post_qc --exclude arrays_allchr_post_qc.prune.out \
     --make-pgen --out arrays_autosomes_post_qc_pruned
 
