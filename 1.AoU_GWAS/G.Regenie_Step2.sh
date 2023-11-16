@@ -1,3 +1,5 @@
+# For working environment,  I recommend 32 CPUs with 120 GB RAM.
+
 # Get necessary files
 wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip
 unzip plink2_linux*
@@ -10,7 +12,7 @@ curr_chr="chr19"
 gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_${curr_chr}_* .
 
 # Do QC, if it has not been run already
-./plink2 --pfile plink_${curr_chr}_multi_split \
+./plink2 --pfile plink_${curr_chr}_multi_split_merged \
         --geno 0.1 --mind 0.1 --hwe 1e-15 \
         --make-pgen --out plink_${curr_chr}_allvar_anc_all
 
@@ -29,8 +31,8 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
 ./regenie_v3.2.8.gz_x86_64_Linux \
     --step 2 \
     --pgen plink_${curr_chr}_allvar_anc_all \
-    --phenoFile regenie_pheno_revised.txt \
-    --covarFile regenie_covar_revised.txt \
+    --phenoFile regenie_pheno.txt \
+    --covarFile regenie_covar.txt \
     --bt --mcc --firth-se \
     --firth --approx --pThresh 0.01 \
     --pred revised_pred.list \
