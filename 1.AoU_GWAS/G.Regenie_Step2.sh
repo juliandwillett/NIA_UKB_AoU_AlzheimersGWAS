@@ -15,7 +15,7 @@ gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_${curr_chr}_* .
         --make-pgen --out plink_${curr_chr}_allvar_anc_all
 
 # revise psam file given the empty column being dropped
-awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" $2}' plink_${curr_chr}_allvar_anc_all.psam > tmp
+awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' plink_${curr_chr}_allvar_anc_all.psam > tmp
 mv tmp plink_${curr_chr}_allvar_anc_all.psam
 
 # Get files for pheno/covar/step1
@@ -23,7 +23,7 @@ gsutil -m cp -rn $bucket/data/regenie_* .
 gsutil -m cp -rn $bucket/data/regenie/* .
 
 # Rename workspace in pred file, to enable running on parallel workspaces
-awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5d1", $2)} 1' aou_step1_rg_array_anc_all_pred.list > revised_pred.list
+awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake520231008a", $2)} 1' aou_step1_rg_array_anc_all_pred.list > revised_pred.list
 
 # Run regenie. I recommend the "--mcc" parameter for additional QC
 ./regenie_v3.2.8.gz_x86_64_Linux \
