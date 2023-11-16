@@ -23,7 +23,7 @@ gsutil -m cp -rn $bucket/data/regenie_* .
 gsutil -m cp -rn $bucket/data/regenie/* .
 
 # Rename workspace in pred file, to enable running on parallel workspaces
-awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake520231008a", $2)} 1' aou_step1_rg_array_anc_all_pred.list > revised_pred.list
+awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_anc_all_pred.list > revised_pred.list
 
 # Run regenie. I recommend the "--mcc" parameter for additional QC
 ./regenie_v3.2.8.gz_x86_64_Linux \
@@ -40,4 +40,4 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake52023
     --phenoCol AD_any
 
 # Backup results
-gsutil -m cp -rn aou_step2_rg_${curr_chr}_firthallvariants $bucket/data/rg_results_mcc/
+gsutil -m cp -rn aou_step2_rg_${curr_chr}_firthallvariants* $bucket/data/rg_results_mcc/
