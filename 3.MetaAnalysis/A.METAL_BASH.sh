@@ -5,4 +5,5 @@ awk -v OFS='\t' 'NR==1 { $13 = "Pval"}1' ukb_proxy_all_anc_with_pval.txt > ukb_p
 awk -v OFS='\t' 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' ukb_proxy_all_anc_with_pvals.txt > ukb_proxy_all_anc_with_pvals_ids.txt
 
 # Run a script with the METAL parameters
+salloc -p test --mem 80000 -t 0-02:00 -n 4
 metal METAL_script.txt
