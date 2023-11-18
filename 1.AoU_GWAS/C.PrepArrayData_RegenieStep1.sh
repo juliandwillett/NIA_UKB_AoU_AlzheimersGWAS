@@ -15,4 +15,4 @@ gsutil -u $GOOGLE_PROJECT -m cp -r $WORKSPACE_BUCKET/data/array_data_pgen_files/
     --make-pgen --out arrays_autosomes_post_qc_pruned
 
 # Backup results
-gsutil -u $GOOGLE_PROJECT -m cp -r arrays_autosomes_post_qc* $WORKSPACE_BUCKET/data/array_data_pgen_files/
+gsutil -u $GOOGLE_PROJECT -m cp -r arrays_autosomes_post_qc* $WORKSPACE_BUCKET/data/array_data_for_regenie_step1/
