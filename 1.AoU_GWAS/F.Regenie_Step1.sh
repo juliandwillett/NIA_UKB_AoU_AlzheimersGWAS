@@ -18,4 +18,4 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip
     --phenoCol AD_any
 
 # Backup results
-gsutil -m cp -rn aou_step1_rg_array* $WORKSPACE_BUCKET/data/regenie/
+gsutil -m cp -rn aou_step1_rg_array* $WORKSPACE_BUCKET/data/regenie_step1_mcc_qt/
