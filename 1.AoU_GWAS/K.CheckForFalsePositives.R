@@ -1,3 +1,10 @@
+# Get necessary programs
+wget https://github.com/rgcgithub/regenie/releases/download/v3.2.8/regenie_v3.2.8.gz_x86_64_Linux.zip ;\
+unzip regenie_v3.2.8.gz_x86_64_Linux.zip ;\
+wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\
+unzip plink2_linux_avx2_20221024.zip
+
+# R code
 library(glue); library(tidyverse) ; library(vroom)
 for (i in 1:22) {
     print(glue("On chr {i}"))
@@ -12,7 +19,7 @@ for (i in 1:22) {
 # bash code
 curr_chr=22
 gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr${curr_chr}_* . ;\
-./plink2 --pfile plink_chr${curr_chr}_multi_split_merged \
+./plink2 --pfile plink_chr${curr_chr}_multi_split \
         --geno 0.1 --mind 0.1 --hwe 1e-15 \
         --make-pgen --out tmp \
         --extract bed1 sig_variants_chr${curr_chr}.txt
@@ -64,11 +71,11 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
 
 ##########
 # Merge the results
-head -n 1 sig_hits_bt_chr10_AD_any.regenie > bt_hits.txt ;\
-head -n 1 sig_hits_bt_chr10_AD_any.regenie > qt_mcc_hits.txt ;\
-head -n 1 sig_hits_bt_chr10_AD_any.regenie > qt_nomcc_hits.txt
+head -n 1 sig_hits_bt_chr17_AD_any.regenie > bt_hits.txt ;\
+head -n 1 sig_hits_bt_chr17_AD_any.regenie > qt_mcc_hits.txt ;\
+head -n 1 sig_hits_bt_chr17_AD_any.regenie > qt_nomcc_hits.txt
 
-for ((i=1;i<=22;i++)); do
+for ((i=17;i<=22;i++)); do
     tail -n +2 "sig_hits_bt_chr${i}_AD_any.regenie" >> bt_hits.txt
     tail -n +2 "sig_hits_qt_mcc_chr${i}_AD_any.regenie" >> qt_mcc_hits.txt
     tail -n +2 "sig_hits_qt_nomcc_chr${i}_AD_any.regenie" >> qt_nomcc_hits.txt
@@ -91,13 +98,9 @@ for (i in 1:22) {
     all_ids %<>% append(df$ID)
 }
 
-df_bt %<>% filter(ID %in% all_ids)
-df_qt_mcc %<>% filter(ID %in% all_ids)
-df_qt_nomcc %<>% filter(ID %in% all_ids)
-
-df_bt %<>% filter(A1FREQ * N >= 20)
-df_qt_mcc %<>% filter(A1FREQ * N >= 20)
-df_qt_nomcc %<>% filter(A1FREQ * N >= 20)
+df_bt %<>% filter(ID %in% all_ids,A1FREQ * N >= 20)
+df_qt_mcc %<>% filter(ID %in% all_ids,A1FREQ * N >= 20)
+df_qt_nomcc %<>% filter(ID %in% all_ids,A1FREQ * N >= 20)
 
 vroom_write(df_bt,"bt_hits_firthse.txt")
 vroom_write(df_qt_mcc,"qt_mcc_hits_firthse.txt")
