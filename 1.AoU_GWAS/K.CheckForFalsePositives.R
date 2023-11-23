@@ -11,7 +11,7 @@ for (i in 1:22) {
 
 # bash code
 curr_chr=22
-gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr${curr_chr}_* .
+gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr${curr_chr}_* . ;\
 ./plink2 --pfile plink_chr${curr_chr}_multi_split_merged \
         --geno 0.1 --mind 0.1 --hwe 1e-15 \
         --make-pgen --out tmp \
@@ -61,3 +61,44 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --out out/sig_hits_bt_chr${curr_chr} \
     --minMAC 20 \
     --phenoCol AD_any
+
+##########
+# Merge the results
+head -n 1 sig_hits_bt_chr10_AD_any.regenie > bt_hits.txt ;\
+head -n 1 sig_hits_bt_chr10_AD_any.regenie > qt_mcc_hits.txt ;\
+head -n 1 sig_hits_bt_chr10_AD_any.regenie > qt_nomcc_hits.txt
+
+for ((i=1;i<=22;i++)); do
+    tail -n +2 "sig_hits_bt_chr${i}_AD_any.regenie" >> bt_hits.txt
+    tail -n +2 "sig_hits_qt_mcc_chr${i}_AD_any.regenie" >> qt_mcc_hits.txt
+    tail -n +2 "sig_hits_qt_nomcc_chr${i}_AD_any.regenie" >> qt_nomcc_hits.txt
+done
+
+#########
+# Use R to focus on variants we care about/are testing
+df_bt = vroom("out/bt_hits.txt",show_col_types = FALSE)
+df_qt_mcc = vroom("out/qt_mcc_hits.txt",show_col_types = FALSE)
+df_qt_nomcc = vroom("out/qt_nomcc_hits.txt",show_col_types = FALSE)
+
+all_ids = character()
+for (i in 1:22) {
+    print(glue("On chr {i}"))
+    gw = vroom(glue("aou_step2_rg_chr{i}_allvar_anc_all_AD_any.regenie"),show_col_types = FALSE) %>% 
+    mutate(ID = glue("{CHROM}-{GENPOS}-{ALLELE0}-{ALLELE1}"))
+    favor = read.table("favor_hits.txt")
+    df = gw %>% filter(LOG10P >= 7.30102999566398 | ID %in% favor$V1) %>%
+        mutate(ID = glue("{CHROM}:{GENPOS}:{ALLELE0},{ALLELE1}"))
+    all_ids %<>% append(df$ID)
+}
+
+df_bt %<>% filter(ID %in% all_ids)
+df_qt_mcc %<>% filter(ID %in% all_ids)
+df_qt_nomcc %<>% filter(ID %in% all_ids)
+
+df_bt %<>% filter(A1FREQ * N >= 20)
+df_qt_mcc %<>% filter(A1FREQ * N >= 20)
+df_qt_nomcc %<>% filter(A1FREQ * N >= 20)
+
+vroom_write(df_bt,"bt_hits_firthse.txt")
+vroom_write(df_qt_mcc,"qt_mcc_hits_firthse.txt")
+vroom_write(df_qt_nomcc,"qt_nomcc_hits_firthse.txt")
