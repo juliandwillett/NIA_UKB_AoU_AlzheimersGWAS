@@ -4,6 +4,9 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip ;\
 wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\
 unzip plink2_linux_avx2_20221024.zip
 
+gsutil -m cp -rn $WORKSPACE_BUCKET/data/rg_results_all_anc_all_var_mac_20/*AD_any.regenie .
+mv aou_step2_rg_chr1_common_anc_all_AD_any.regenie aou_step2_rg_chr1_allvar_anc_all_AD_any.regenie # naming error
+
 # R code
 library(glue); library(tidyverse) ; library(vroom)
 for (i in 1:22) {
@@ -25,10 +28,17 @@ mkdir out
 
 gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr${curr_chr}_* . ;\
 
-./plink2 --pfile plink_chr${curr_chr}_multi_split \
+if ((curr_chr>=17)) ; then
+    ./plink2 --pfile plink_chr${curr_chr}_multi_split \
         --geno 0.1 --mind 0.1 --hwe 1e-15 \
         --make-pgen --out tmp \
         --extract bed1 sig_variants_chr${curr_chr}.txt
+else
+    ./plink2 --pfile plink_chr${curr_chr}_multi_split_merged \
+        --geno 0.1 --mind 0.1 --hwe 1e-15 \
+        --make-pgen --out tmp \
+        --extract bed1 sig_variants_chr${curr_chr}.txt
+fi
 
 # revise psam file given the empty column being dropped
 awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' tmp.psam > t ;\
