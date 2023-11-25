@@ -18,7 +18,13 @@ for (i in 1:22) {
 
 # bash code
 curr_chr=22
+gsutil -m cp -rn $WORKSPACE_BUCKET/data/regenie_pheno.txt .
+gsutil -m cp -rn $WORKSPACE_BUCKET/data/regenie_covar.txt .
+gsutil -m cp -rn $WORKSPACE_BUCKET/data/regenie/* .
+mkdir out
+
 gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr${curr_chr}_* . ;\
+
 ./plink2 --pfile plink_chr${curr_chr}_multi_split \
         --geno 0.1 --mind 0.1 --hwe 1e-15 \
         --make-pgen --out tmp \
@@ -63,7 +69,7 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --covarFile regenie_covar.txt \
     --bt --firth-se \
     --firth --approx --pThresh 0.01 \
-    --pred revised_pred.list --ignore-pred \
+    --pred revised_pred.list \
     --bsize 400 \
     --out out/sig_hits_bt_chr${curr_chr} \
     --minMAC 20 \
