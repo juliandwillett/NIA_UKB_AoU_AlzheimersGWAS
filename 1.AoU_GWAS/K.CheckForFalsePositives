@@ -85,6 +85,11 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --minMAC 20 \
     --phenoCol AD_any
 
+# an alternative for getting the firth SE (if this parameter was forgotten, but firth option still selected) in R
+gwas = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_AD_any_anc_all_gwas_pvals_ids_chrompos.txt")
+gwas %<>% mutate(SE = abs(BETA/ qnorm(Pval/2)))
+vroom_write(gwas,"/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_AD_any_anc_all_gwas_pvals_ids_chrompos_firthse.txt")
+
 ##########
 # Merge the results
 head -n 1 sig_hits_bt_chr17_AD_any.regenie > bt_hits.txt ;\
