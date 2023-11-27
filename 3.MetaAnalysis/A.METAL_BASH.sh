@@ -14,9 +14,9 @@ metal METAL_script.txt
 mv METAANALYSIS1.TBL aou_ukb_allvar_meta_analysis.TBL
 
 # Add CHR and POS columns, to make sorting easier
-awk -v OFS='\t' 'NR==1 {print $0} NR>1 {split($1, values, ":"); $(NF+1) = values[1]; $(NF+2) = values[2]; print $0}' \
+awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0 "\tCHR\tPOS"} NR>1 {split($1, values, ":"); $16 = values[1]; $17 = values[2]; print $0}' \
   aou_ukb_allvar_meta_analysis.TBL > aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL
 
 # Isolate GW significant hits to focus the analysis (and make R code work more efficiently)
-awk -v OFS='\t' 'NR==1 {print $0} NR>1 && $10 <= 5e-8 {print $0}' aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL > \
+awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0} NR>1 && $10 <= 5e-8 {print $0}' aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL > \
   aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL
