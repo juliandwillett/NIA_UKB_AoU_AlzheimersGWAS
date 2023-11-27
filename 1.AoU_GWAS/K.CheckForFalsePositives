@@ -30,12 +30,12 @@ gsutil -m cp -rn $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr${curr_chr}_* .
 
 if ((curr_chr>=17)) ; then
     ./plink2 --pfile plink_chr${curr_chr}_multi_split \
-        --geno 0.1 --mind 0.1 --hwe 1e-15 \
+        --geno 0.1 --hwe 1e-15 \
         --make-pgen --out tmp \
         --extract bed1 sig_variants_chr${curr_chr}.txt
 else
     ./plink2 --pfile plink_chr${curr_chr}_multi_split_merged \
-        --geno 0.1 --mind 0.1 --hwe 1e-15 \
+        --geno 0.1 --hwe 1e-15 \
         --make-pgen --out tmp \
         --extract bed1 sig_variants_chr${curr_chr}.txt
 fi
