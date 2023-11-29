@@ -33,3 +33,8 @@ awk 'NR==FNR{arr[$16]; next} $16 in arr' meta_hits_for_intersects.txt \
 awk 'NR==FNR{arr[$16]; next} $14 in arr' meta_hits_for_intersects.txt \
   /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_chrompos.txt > \
   meta_hits_ukb_intersect.txt
+
+# Then make files for Manhattan to ensure efficiency
+awk 'NR==1 {print $0} NR>1 && $16 < 23 && $7 - $6 < 0.4 && $10 < 1e-3 {print $0}' \
+/n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL > \
+/n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/meta_qc_for_manhattan.txt
