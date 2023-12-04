@@ -44,3 +44,5 @@ echo "0.5 0 0.5" >> range_list ;
     --q-score-range range_list SNP.pvalue \
     --extract study_snps.txt \
     --out grs_chr${curr_chr}
+
+# Plotting ideas: https://github.com/benjacobs123456/PRS_UKB_MRI
