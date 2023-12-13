@@ -1,7 +1,7 @@
 # For working environment,  I recommend 32 CPUs with 120 GB RAM.
 
 # Get necessary files
-wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip
+wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\
 unzip plink2_linux*
 wget https://github.com/rgcgithub/regenie/releases/download/v3.2.8/regenie_v3.2.8.gz_x86_64_Linux.zip
 unzip regenie_v3.2.8.gz_x86_64_Linux.zip
