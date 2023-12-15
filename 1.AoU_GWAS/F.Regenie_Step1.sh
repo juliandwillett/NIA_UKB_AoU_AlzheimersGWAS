@@ -10,7 +10,7 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip
     --pgen arrays_autosomes_post_qc_pruned \
     --phenoFile regenie_pheno.txt \
     --covarFile regenie_covar.txt \
-    --qt --force-qt --mcc \
+    --bt \
     --out aou_step1_rg_array \
     --bsize 1000 \
     --lowmem \
@@ -18,18 +18,19 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip
     --phenoCol AD_any
 
 # Run regenie with exclusion of related individuals
+awk 'NR==1 {print "#FID\tIID"} NR>1 {print "0\t" $1}' relatedness_flagged_samples.tsv > related_flagged_for_regenie.txt
 ./regenie_v3.2.8.gz_x86_64_Linux \
     --step 1 \
     --pgen arrays_autosomes_post_qc_pruned \
-    --phenoFile regenie_pheno.txt \
-    --covarFile regenie_covar.txt \
-    --qt --force-qt --mcc \
-    --out aou_step1_rg_array \
+    --phenoFile regenie_pheno_revised.txt \
+    --covarFile regenie_covar_revised.txt \
+    --bt \
+    --out aou_step1_rg_array_norelated \
     --bsize 1000 \
     --lowmem \
     --lowmem-prefix tmp_rg_20 \
-    --phenoCol AD_any
-    --exclude relatedness_flagged_samples.tsv
+    --phenoCol AD_any \
+    --remove related_flagged_for_regenie.txt
 
 # Backup results
-gsutil -m cp -rn aou_step1_rg_array* $WORKSPACE_BUCKET/data/regenie_step1_mcc_qt/
+gsutil -m cp -rn aou_step1_rg_array_norelated_* $WORKSPACE_BUCKET/data/regenie_step1_norelated/
