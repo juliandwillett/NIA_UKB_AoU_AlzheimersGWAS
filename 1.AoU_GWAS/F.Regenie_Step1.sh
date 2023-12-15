@@ -22,8 +22,8 @@ awk 'NR==1 {print "#FID\tIID"} NR>1 {print "0\t" $1}' relatedness_flagged_sample
 ./regenie_v3.2.8.gz_x86_64_Linux \
     --step 1 \
     --pgen arrays_autosomes_post_qc_pruned \
-    --phenoFile regenie_pheno_revised.txt \
-    --covarFile regenie_covar_revised.txt \
+    --phenoFile regenie_pheno.txt \
+    --covarFile regenie_covar.txt \
     --bt \
     --out aou_step1_rg_array_norelated \
     --bsize 1000 \
