@@ -17,5 +17,19 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip
     --lowmem-prefix tmp_rg_20 \
     --phenoCol AD_any
 
+# Run regenie with exclusion of related individuals
+./regenie_v3.2.8.gz_x86_64_Linux \
+    --step 1 \
+    --pgen arrays_autosomes_post_qc_pruned \
+    --phenoFile regenie_pheno.txt \
+    --covarFile regenie_covar.txt \
+    --qt --force-qt --mcc \
+    --out aou_step1_rg_array \
+    --bsize 1000 \
+    --lowmem \
+    --lowmem-prefix tmp_rg_20 \
+    --phenoCol AD_any
+    --exclude relatedness_flagged_samples.tsv
+
 # Backup results
 gsutil -m cp -rn aou_step1_rg_array* $WORKSPACE_BUCKET/data/regenie_step1_mcc_qt/
