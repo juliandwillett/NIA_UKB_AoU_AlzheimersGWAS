@@ -14,7 +14,8 @@ gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_${curr_chr}_* .
 # Do QC, if it has not been run already. Did not do mind because AoU already flagged individuals and aimed to maximize sample size
 ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
         --geno 0.1 --hwe 1e-15 \
-        --make-pgen --out plink_${curr_chr}_allvar_anc_all
+        --make-pgen --out plink_${curr_chr}_allvar_anc_all \
+        --remove related_flagged_for_regenie.txt --mac 20
 
 # revise psam file given the empty column being dropped
 awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' plink_${curr_chr}_allvar_anc_all.psam > tmp
@@ -25,7 +26,7 @@ gsutil -m cp -rn $bucket/data/regenie_* .
 gsutil -m cp -rn $bucket/data/regenie/* .
 
 # Rename workspace in pred file, to enable running on parallel workspaces
-awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_anc_all_pred.list > revised_pred.list
+awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_norelated_pred.list > revised_pred.list
 
 # Run regenie. I recommend the "--mcc" parameter for additional QC
 ./regenie_v3.2.8.gz_x86_64_Linux \
@@ -33,7 +34,7 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --pgen plink_${curr_chr}_allvar_anc_all \
     --phenoFile regenie_pheno.txt \
     --covarFile regenie_covar.txt \
-    --bt --mcc --firth-se \
+    --bt --firth-se \
     --firth --approx --pThresh 0.01 \
     --pred revised_pred.list \
     --bsize 400 \
@@ -42,4 +43,4 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --phenoCol AD_any
 
 # Backup results
-gsutil -m cp -rn aou_step2_rg_${curr_chr}_firthallvariants* $bucket/data/rg_results_mcc/
+gsutil -m cp -rn aou_step2_rg_${curr_chr}_firthallvariants* $bucket/data/rg_results_norel_allanc/
