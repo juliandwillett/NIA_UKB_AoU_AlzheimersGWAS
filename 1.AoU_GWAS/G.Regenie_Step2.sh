@@ -12,6 +12,7 @@ curr_chr="chr19"
 gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_${curr_chr}_* .
 
 # Do QC, if it has not been run already. Did not do mind because AoU already flagged individuals and aimed to maximize sample size
+# IMPORTANT: ENSURE THAT FID IID COLUMNS IN RELATED FLAGGED FOR REGENIE FILE MATCH PSAM FILE
 ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
         --geno 0.1 --hwe 1e-15 \
         --make-pgen --out plink_${curr_chr}_allvar_anc_all \
