@@ -57,7 +57,8 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --bsize 400 \
     --out out/sig_hits_qt_mcc_chr${curr_chr} \
     --minMAC 20 \
-    --phenoCol AD_any  
+    --phenoCol AD_any \
+    --extract gw_sig_norel_ids.txt
 
 ./regenie_v3.2.8.gz_x86_64_Linux \
     --step 2 \
@@ -70,7 +71,8 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --bsize 400 \
     --out out/sig_hits_qt_nomcc_chr${curr_chr} \
     --minMAC 20 \
-    --phenoCol AD_any ;
+    --phenoCol AD_any \
+    --extract gw_sig_norel_ids.txt;
 
 ./regenie_v3.2.8.gz_x86_64_Linux \
     --step 2 \
@@ -83,7 +85,8 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --bsize 400 \
     --out out/sig_hits_bt_chr${curr_chr} \
     --minMAC 20 \
-    --phenoCol AD_any
+    --phenoCol AD_any \
+    --extract gw_sig_norel_ids.txt
 
 # an alternative for getting the firth SE (if this parameter was forgotten, but firth option still selected) in R. Verified as accurate manually
 gwas = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_AD_any_anc_all_gwas_pvals_ids_chrompos.txt")
