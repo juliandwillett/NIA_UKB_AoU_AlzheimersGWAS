@@ -16,7 +16,7 @@ gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_${curr_chr}_* .
 ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
         --geno 0.1 --hwe 1e-15 \
         --make-pgen --out plink_${curr_chr}_allvar_anc_all \
-        --remove related_flagged_for_regenie.txt --mac 20
+        --mac 20
 
 # revise psam file given the empty column being dropped
 awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' plink_${curr_chr}_allvar_anc_all.psam > tmp
