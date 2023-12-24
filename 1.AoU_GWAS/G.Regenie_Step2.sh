@@ -62,7 +62,7 @@ for ((chr=1;chr<=22;chr++)); do \
                     --out aou_step2_rg_${curr_chr}_firthallvariants_${anc} \
                     --minMAC 20 \
                     --phenoCol AD_any --keep ${anc}_ids.txt ;\
-                gsutil -m cp -rn aou_step2_rg_${curr_chr}_firthallvariants_${anc}* $WORKSPACE_BUCKET/data/rg_results_rel_anc_strat/ ;\
+                gsutil -m cp -r aou_step2_rg_${curr_chr}_firthallvariants_${anc}* $WORKSPACE_BUCKET/data/rg_results_rel_anc_strat/ ;\
         done  
 done
 
