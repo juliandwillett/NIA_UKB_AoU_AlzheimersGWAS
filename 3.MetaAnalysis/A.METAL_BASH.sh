@@ -23,7 +23,7 @@ awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0} NR>1 && $10 <= 5e-8 {print $0}' ao
   aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL
 
 # to make intersect reference file: in R
-data = vroom("aou_ukb_allvar_meta_qc_sorted_gwsig.txt")
+data = vroom("aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL")
 data %<>% mutate(CHRPOS = glue("{CHR}-{POS}"))
 vroom_write(data,"meta_hits_for_intersects.txt")
 
