@@ -23,16 +23,16 @@ awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0} NR>1 && $10 <= 5e-8 {print $0}' ao
   aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL
 
 # to make intersect reference file: in R
-data = vroom("aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL")
+data = vroom("aou_ukb_allvar_meta_qc_sorted_gwsig.txt")
 data %<>% mutate(CHRPOS = glue("{CHR}-{POS}"))
 vroom_write(data,"meta_hits_for_intersects.txt")
 
 # Intersect the meta significant hits with each GWAS to make getting p values more efficient
 awk 'NR==FNR{arr[$16]; next} $16 in arr' meta_hits_for_intersects.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_AD_any_anc_all_gwas_pvals_ids_chrompos_firthse.txt > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_AD_any_anc_all_gwas_pvals_ids_chrompos_firthse_ensure20.txt > \
   meta_hits_aou_intersect.txt
 awk 'NR==FNR{arr[$16]; next} $14 in arr' meta_hits_for_intersects.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_chrompos.txt > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_ensure20.txt > \
   meta_hits_ukb_intersect.txt
 
 # Then make files for Manhattan to ensure efficiency
