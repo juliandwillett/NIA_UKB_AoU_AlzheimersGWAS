@@ -12,3 +12,6 @@ awk 'BEGIN {OFS="\t"} NR==1 {print; next} { if ($7 > 0.5) { temp=$5; $5=$6; $6=t
 /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS/NIAGADS_meta.tsv > \
 /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_allminoralleles.tsv
 
+# Double check that results correspond to minimum 20 individuals, per AoU requirements for making summary stats public
+awk 'NR==1 {print} NR>1 && $6 * $7 >= 20 {print}' aou_AD_any_anc_all_gwas_pvals_ids_chrompos_firthse_allminoralleles.txt > 
+aou_AD_any_anc_all_gwas_pvals_ids_chrompos_firthse_allminoralleles_ensure20.txt
