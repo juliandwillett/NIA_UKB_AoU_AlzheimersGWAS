@@ -28,10 +28,10 @@ data %<>% mutate(CHRPOS = glue("{CHR}-{POS}"))
 vroom_write(data,"meta_hits_for_intersects_aou_vs_ukb.txt")
 
 # Intersect the meta significant hits with each GWAS to make getting p values more efficient
-awk 'NR==FNR{arr[$16]; next} $16 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
+awk 'NR==FNR{arr[$19]; next} $16 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
   /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_AD_any_anc_all_gwas_pvals_ids_chrompos_firthse_ensure20.txt > \
   meta_hits_aou_intersect_aou_vs_ukb.txt
-awk 'NR==FNR{arr[$16]; next} $14 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
+awk 'NR==FNR{arr[$19]; next} $14 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
   /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_ensure20.txt > \
   meta_hits_ukb_intersect_aou_vs_ukb.txt
 
