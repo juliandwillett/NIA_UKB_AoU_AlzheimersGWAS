@@ -42,6 +42,11 @@ awk 'NR==FNR{arr[$19]; next} $15 in arr' meta_hits_for_intersects_aou_vs_ukb.txt
   /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos.txt > \
   meta_hits_niagads_intersect_aou_vs_ukb.txt
 
+# Also intersect with Bellenguez sumstats to speed up checking for mutual hits, re concern for FP
+awk 'NR==FNR{arr[$19]; next} $18 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
+  /n/home09/jwillett/true_lab_storage/Data_Links/Other_GWAS/bellengeuz_meta_ids_chrpos.tsv > \
+  meta_hits_bell_intersect_aou_vs_ukb.txt
+
 # Then make files for Manhattan to ensure efficiency
 awk 'NR==1 {print $0} NR>1 && $16 < 23 && $7 - $6 < 0.4 && $10 < 1e-3 {print $0}' \
 /n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL > \
