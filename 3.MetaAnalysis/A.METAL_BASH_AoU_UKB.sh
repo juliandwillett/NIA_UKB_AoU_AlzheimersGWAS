@@ -39,7 +39,7 @@ awk 'NR==FNR{arr[$19]; next} $14 in arr' meta_hits_for_intersects_aou_vs_ukb.txt
 
 # Intersect with NIAGADS to check for mutual hits
 awk 'NR==FNR{arr[$19]; next} $15 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos_ensure20.txt > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos.txt > \
   meta_hits_niagads_intersect_aou_vs_ukb.txt
 
 # Then make files for Manhattan to ensure efficiency
