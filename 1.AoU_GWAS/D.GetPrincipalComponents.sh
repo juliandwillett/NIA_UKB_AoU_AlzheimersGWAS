@@ -15,3 +15,17 @@ gsutil -m cp -r -n $WORKSPACE_BUCKET/data/pgen_minimal_qc/plink_chr19_merged.psa
 
 # Backup results
 gsutil -m cp -rn array_autosomes_postqc_pruned_onlysrwgs_pca_results_plink* $WORKSPACE_BUCKET/data/pc_data/
+
+################################
+# To get the rare 20 PCs
+./plink2 \
+  --pfile arrays_allchr \
+  --max-maf 0.005 --geno 0.1 --hwe 1e-15 \
+  --make-pgen --chr 1-22 \
+  --out arrays_autosomes_rare_postqc \
+  --indep-pairwise 100kb 1 0.1
+
+./plink2 --pfile arrays_autosomes_post_qc --exclude arrays_allchr_post_qc.prune.out \
+    --make-pgen --out arrays_autosomes_post_qc_pruned
+
+gsutil -u $GOOGLE_PROJECT -m cp -r arrays_autosomes_post_qc* $WORKSPACE_BUCKET/data/array_data_for_regenie_step1/
