@@ -48,3 +48,12 @@ head -n 1 grs_files/chr4.hardy > grs_files/hardy_values.txt ;\
 for file in grs_files/*.hardy; do \
     tail -n +2 "$file" >> grs_files/hardy_values.txt ;\
 done
+
+##############
+# Given that some of the variants are present in fewer than 20 individuals, do the data processing in AoU workbench via R
+alleles = vroom("grs_df_for_score.txt")
+df = vroom("grs_files/hardy_values.txt") %>% arrange(`#CHROM`,ID) %>% 
+    separate(ID,into = c("CHR", "POS"), sep = ":") %>%
+    mutate(IDrev = glue("{CHR}:{POS}:{AX},{A1}")) %>% filter(ID %in% alleles$ID | IDrev %in% alleles$ID)
+print(glue("Orig len: {nrow(alleles)}. Remaining len: {nrow(df)}"))
+head(df)
