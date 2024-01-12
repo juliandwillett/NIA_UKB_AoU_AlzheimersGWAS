@@ -35,6 +35,13 @@ for ((chr=1;chr<17;chr++)) ; do \
     --missing --hardy --out grs_files/${curr_chr} \
     --extract bed1 grs_hits_plink_pos_sorted.bed ;\
 done
+for ((chr=17;chr<=22;chr++)) ; do \
+  curr_chr="chr${chr}" ;\
+  ./plink2 --pfile plink_${curr_chr}_multi_split \
+    --set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
+    --missing --hardy --out grs_files/${curr_chr} \
+    --extract bed1 grs_hits_plink_pos_sorted.bed ;\
+done
 
 # merge the results for export
 head -n 1 grs_files/chr4 > grs_files/hardy_values.txt
