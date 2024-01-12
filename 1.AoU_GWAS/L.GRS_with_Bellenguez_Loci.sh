@@ -35,3 +35,9 @@ for ((chr=1;chr<17;chr++)) ; do \
     --missing --hardy --out grs_files/${curr_chr} \
     --extract bed1 grs_hits_plink_pos_sorted.bed ;\
 done
+
+# merge the results for export
+head -n 1 grs_files/chr4 > grs_files/hardy_values.txt
+for file in grs_files/*.hardy; do \
+    tail -n +2 "$file" >> grs_files/hardy_values.txt ;\
+done
