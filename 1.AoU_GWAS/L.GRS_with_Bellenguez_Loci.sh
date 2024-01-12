@@ -44,7 +44,7 @@ for ((chr=17;chr<=22;chr++)) ; do \
 done
 
 # merge the results for export
-head -n 1 grs_files/chr4 > grs_files/hardy_values.txt ;\
+head -n 1 grs_files/chr4.hardy > grs_files/hardy_values.txt ;\
 for file in grs_files/*.hardy; do \
     tail -n +2 "$file" >> grs_files/hardy_values.txt ;\
 done
