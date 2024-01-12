@@ -28,8 +28,10 @@ else
 fi
 
 # Then get the Hardy values to show what is going on with many of the hits
-curr_chr="1"
-./plink2 --pfile plink_chr${curr_chr}_multi_split_merged \
---set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
---missing --hardy --out grs_files/${curr_chr} \
---extract bed1 grs_hits_plink_pos_sorted.bed
+for ((chr=1;chr<17;chr++)) ; do \
+  curr_chr="chr${chr}" ;\
+  ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
+    --set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
+    --missing --hardy --out grs_files/${curr_chr} \
+    --extract bed1 grs_hits_plink_pos_sorted.bed ;\
+done
