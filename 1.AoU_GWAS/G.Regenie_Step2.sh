@@ -43,6 +43,24 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
     --minMAC 20 \
     --phenoCol AD_any
 
+# run regenie for non ancestry stratified in parallel
+for ((chr=1;chr<=22;chr++)); do \
+        curr_chr="chr${chr}" ;\
+                ./regenie_v3.2.8.gz_x86_64_Linux \
+                    --step 2 \
+                    --pgen plink_${curr_chr}_allvar_anc_all \
+                    --phenoFile regenie_pheno.txt \
+                    --covarFile regenie_covar.txt \
+                    --bt --firth-se \
+                    --firth --approx --pThresh 0.01 \
+                    --pred revised_pred.list \
+                    --bsize 400 \
+                    --out aou_step2_rg_${curr_chr}_firthallvariants_commonrarepcs \
+                    --minMAC 20 \
+                    --phenoCol AD_any ;\
+                gsutil -m cp -r aou_step2_rg_${curr_chr}_firthallvariants_commonrarepcs* $WORKSPACE_BUCKET/data/rg_results_commonrarepcs/ ;\
+done
+
 # run regenie for ancestry-stratified cohorts
 gsutil cp $WORKSPACE_BUCKET/data/*_ids.txt .
 ancestries=(eur afr amr)
