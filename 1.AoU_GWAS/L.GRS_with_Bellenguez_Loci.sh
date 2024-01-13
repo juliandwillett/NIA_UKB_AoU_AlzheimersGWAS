@@ -66,14 +66,14 @@ for ((chr=1;chr<17;chr++)) ; do \
   curr_chr="chr${chr}" ;\
   ./plink2 --pfile plink_${curr_chr}_multi_split_merged --geno 0.1 \
     --set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
-    --missing --hardy --out grs_files_postqc_except_hwe/${curr_chr} \
+    --missing --hardy midp --out grs_files_postqc_except_hwe/${curr_chr} \
     --extract bed1 grs_hits_plink_pos_sorted.bed ;\
-done
+done ;\
 for ((chr=17;chr<=22;chr++)) ; do \
   curr_chr="chr${chr}" ;\
   ./plink2 --pfile plink_${curr_chr}_multi_split --geno 0.1 \
     --set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
-    --missing --hardy --out grs_files_postqc_except_hwe/${curr_chr} \
+    --missing --hardy midp --out grs_files_postqc_except_hwe/${curr_chr} \
     --extract bed1 grs_hits_plink_pos_sorted.bed ;\
 done
 # merge the results for export
