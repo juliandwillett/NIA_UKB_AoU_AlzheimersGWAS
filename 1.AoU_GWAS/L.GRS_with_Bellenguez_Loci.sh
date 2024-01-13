@@ -81,3 +81,7 @@ head -n 1 grs_files_postqc_except_hwe/chr4.hardy > grs_files_postqc_except_hwe/h
 for file in grs_files_postqc_except_hwe/*.hardy; do \
     tail -n +2 "$file" >> grs_files_postqc_except_hwe/hardy_values.txt ;\
 done
+
+#####################
+# Check this all for only controls
+awk 'NR==1 {print} NR>1 && $4 == 0 {print $1 "\t" $2}' regenie_pheno.txt > just_controls.txt
