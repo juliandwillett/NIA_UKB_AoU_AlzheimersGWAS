@@ -85,10 +85,3 @@ done
 
 #####
 # Code for parallelizing
-for ((chr=17;chr<22;chr++)); do curr_chr="chr${chr}"; ./plink2 --pfile plink_${curr_chr}_multi_split \
---geno 0.1 --hwe 1e-15         --make-pgen --out plink_${curr_chr}_allvar_anc_all \
---remove related_flagged_for_regenie.txt --mac 20 ;awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' \
-plink_${curr_chr}_allvar_anc_all.psam > tmp ;mv tmp plink_${curr_chr}_allvar_anc_all.psam ;./regenie_v3.2.8.gz_x86_64_Linux \
---step 2     --pgen plink_${curr_chr}_allvar_anc_all     --phenoFile regenie_pheno.txt     --covarFile regenie_covar.txt \
---bt --firth-se     --firth --approx --pThresh 0.01     --pred revised_pred.list     --bsize 400     --out aou_step2_rg_${curr_chr}_firthallvariants \
---minMAC 20     --phenoCol AD_any ;gsutil -m cp -r aou_step2_rg_${curr_chr}_firthallvariants* $WORKSPACE_BUCKET/data/rg_results_norel_allanc/; done
