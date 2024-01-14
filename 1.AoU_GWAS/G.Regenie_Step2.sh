@@ -52,7 +52,7 @@ for ((chr=1;chr<=22;chr++)); do \
                     --covarFile regenie_covar.txt \
                     --bt --firth-se \
                     --firth --approx --pThresh 0.01 \
-                    --pred revised_pred.list \
+                    --pred aou_step1_rg_array_common_rare_pcs_pred.list \
                     --bsize 400 \
                     --out aou_step2_rg_${curr_chr}_firthallvariants_commonrarepcs \
                     --minMAC 20 \
