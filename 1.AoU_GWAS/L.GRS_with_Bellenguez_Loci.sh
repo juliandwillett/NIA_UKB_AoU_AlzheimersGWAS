@@ -135,3 +135,34 @@ head -n 1 commonrare_hits_hardymissing_nomissing/chr4.hardy > commonrare_hits_ha
 for file in commonrare_hits_hardymissing_nomissing/*.hardy; do \
     tail -n +2 "$file" >> commonrare_hits_hardymissing_nomissing/hardy_values.txt ;\
 done
+
+# Code for doing MCC against the hits
+for ((curr_chr=1;curr_chr<=22;curr_chr++)) ; do \
+if ((curr_chr>=17)) ; then \
+    ./plink2 --pfile plink_chr${curr_chr}_multi_split \
+        --geno 0.1 \
+        --make-pgen --out commonrarepcs_mcc_testing/tmp \
+        --extract bed1 sig_variants_for_mcc.bed ;\
+else \
+    ./plink2 --pfile plink_chr${curr_chr}_multi_split_merged \
+        --geno 0.1 \
+        --make-pgen --out commonrarepcs_mcc_testing/tmp \
+        --extract bed1 sig_variants_for_mcc.bed ;\
+fi ;\
+# revise psam file given the empty column being dropped
+awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' tmp.psam > t ;\
+mv t tmp.psam ;
+
+./regenie_v3.2.8.gz_x86_64_Linux \
+    --step 2 \
+    --pgen tmp \
+    --phenoFile regenie_pheno.txt \
+    --covarFile regenie_covar.txt \
+    --qt --force-qt --mcc --firth-se \
+    --firth --approx --pThresh 0.01 \
+    --pred aou_step1_rg_array_common_rare_pcs_pred.list --ignore-pred \
+    --bsize 400 \
+    --out commonrarepcs_mcc_testing/sig_hits_qt_mcc_chr${curr_chr} \
+    --minMAC 20 \
+    --phenoCol AD_any
+    done
