@@ -141,16 +141,16 @@ for ((curr_chr=1;curr_chr<=22;curr_chr++)) ; do \
 if ((curr_chr>=17)) ; then \
     ./plink2 --pfile plink_chr${curr_chr}_multi_split \
         --geno 0.1 \
-        --make-pgen --out commonrarepcs_mcc_testing/tmp \
+        --make-pgen --out tmp \
         --extract bed1 sig_variants_for_mcc.bed ;\
 else \
     ./plink2 --pfile plink_chr${curr_chr}_multi_split_merged \
         --geno 0.1 \
-        --make-pgen --out commonrarepcs_mcc_testing/tmp \
+        --make-pgen --out tmp \
         --extract bed1 sig_variants_for_mcc.bed ;\
 fi ;\
 # revise psam file given the empty column being dropped
-awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' tmp.psam > t ;\
+awk 'NR==1 {print} NR>1 {print "0\t" $1 "\t" "NA"}' tmp.psam > t ;\
 mv t tmp.psam ;
 
 ./regenie_v3.2.8.gz_x86_64_Linux \
