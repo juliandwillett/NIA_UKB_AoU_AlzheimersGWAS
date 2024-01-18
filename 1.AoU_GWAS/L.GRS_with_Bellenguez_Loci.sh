@@ -85,3 +85,53 @@ done
 #####################
 # Check this all for only controls
 awk 'NR==1 {print} NR>1 && $4 == 0 {print $1 "\t" $2}' regenie_pheno.txt > just_controls.txt
+
+#####################
+# Check against results for study including rare and common PCs (way too many hits)
+for ((chr=1;chr<17;chr++)) ; do \
+  curr_chr="chr${chr}" ;\
+  ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
+    --set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
+    --missing --hardy midp --out commonrare_hits_hardymissing/${curr_chr} \
+    --extract bed1 commonrarepcs_hits.bed ;\
+done ;\
+for ((chr=17;chr<=22;chr++)) ; do \
+  curr_chr="chr${chr}" ;\
+  ./plink2 --pfile plink_${curr_chr}_multi_split \
+    --set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
+    --missing --hardy midp --out commonrare_hits_hardymissing/${curr_chr} \
+    --extract bed1 commonrarepcs_hits.bed ;\
+done
+# merge the results for export
+head -n 1 commonrare_hits_hardymissing/chr4.hardy > commonrare_hits_hardymissing/hardy_values.txt ;\
+for file in commonrare_hits_hardymissing/*.hardy; do \
+    tail -n +2 "$file" >> commonrare_hits_hardymissing/hardy_values.txt ;\
+done
+head -n 1 commonrare_hits_hardymissing/chr4.smiss > commonrare_hits_hardymissing/smiss_values.txt ;\
+for file in commonrare_hits_hardymissing/*.smiss; do \
+    tail -n +2 "$file" >> commonrare_hits_hardymissing/smiss_values.txt ;\
+done
+head -n 1 commonrare_hits_hardymissing/chr4.vmiss > commonrare_hits_hardymissing/vmiss_values.txt ;\
+for file in commonrare_hits_hardymissing/*.vmiss; do \
+    tail -n +2 "$file" >> commonrare_hits_hardymissing/vmiss_values.txt ;\
+done
+
+# Filter by missingness to ensure my formula works
+for ((chr=1;chr<17;chr++)) ; do \
+  curr_chr="chr${chr}" ;\
+  ./plink2 --pfile plink_${curr_chr}_multi_split_merged --geno 0.1 \
+    --set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
+    --missing --hardy midp --out commonrare_hits_hardymissing_nomissing/${curr_chr} \
+    --extract bed1 commonrarepcs_hits.bed ;\
+done ;\
+for ((chr=17;chr<=22;chr++)) ; do \
+  curr_chr="chr${chr}" ;\
+  ./plink2 --pfile plink_${curr_chr}_multi_split --geno 0.1 \
+    --set-all-var-ids @:#:\$r,\$a --new-id-max-allele-len 10000 \
+    --missing --hardy midp --out commonrare_hits_hardymissing_nomissing/${curr_chr} \
+    --extract bed1 commonrarepcs_hits.bed ;\
+done
+head -n 1 commonrare_hits_hardymissing_nomissing/chr4.hardy > commonrare_hits_hardymissing_nomissing/hardy_values.txt ;\
+for file in commonrare_hits_hardymissing_nomissing/*.hardy; do \
+    tail -n +2 "$file" >> commonrare_hits_hardymissing_nomissing/hardy_values.txt ;\
+done
