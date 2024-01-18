@@ -150,8 +150,10 @@ else \
         --extract bed1 sig_variants_for_mcc.bed ;\
 fi ;\
 # revise psam file given the empty column being dropped
-awk 'NR==1 {print} NR>1 {print "0\t" $1 "\t" "NA"}' tmp.psam > t ;\
+if ((curr_chr>=16)); then\
+awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' tmp.psam > t ;\
 mv t tmp.psam ;
+fi
 
 ./regenie_v3.2.8.gz_x86_64_Linux \
     --step 2 \
