@@ -168,3 +168,8 @@ fi
     --minMAC 20 \
     --phenoCol AD_any
     done
+    
+head -n 1 commonrarepcs_mcc_testing/sig_hits_qt_mcc_chr10_AD_any.regenie > commonrarepcs_mcc_testing/mcc.txt ;\
+for file in commonrarepcs_mcc_testing/*.regenie; do \
+    tail -n +2 "$file" >> commonrarepcs_mcc_testing/mcc.txt ;\
+done
