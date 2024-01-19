@@ -173,3 +173,61 @@ head -n 1 commonrarepcs_mcc_testing/sig_hits_qt_mcc_chr10_AD_any.regenie > commo
 for file in commonrarepcs_mcc_testing/*.regenie; do \
     tail -n +2 "$file" >> commonrarepcs_mcc_testing/mcc.txt ;\
 done
+
+#######################
+# So adding 20 rare PCs does not help, so going back to using only the top 20 common PCs
+# Now to get HWE and run regenie on only the Bell GRS hits
+{r}
+df_bell = vroom("SupplementalTable5_meta_vs_bellenguez_vs_niagads_comparison.txt",show_col_types = F) %>%
+    separate(ID,into=c("CHR","POS","A0","A1"),sep = "-",remove = F) %>%
+    select(ID,CHR,POS,A0,A1,Bell_MAF,Bell_P) %>% mutate(AoU_Multi_MAF=NA,AoU_Multi_P=NA,AoU_Multi_HWE=NA,
+                                         AoU_EUR_MAF=NA,AoU_EUR_P=NA,AoU_EUR_HWE=NA,
+                                         AoU_AFR_MAF=NA,AoU_AFR_P=NA,AoU_AFR_HWE=NA,
+                                         AoU_AMR_MAF=NA,AoU_AMR_P=NA,AoU_AMR_HWE=NA)
+head(df_bell)
+# so need the MAF and P for hits (without HWE QC), so run plink hardy AND regenie on subcohorts
+vroom_write(data.frame(CHR=df_bell$CHR,POSSTART=df_bell$POS,POSSTOP=df_bell$POS),"bell_hits.bed")
+
+df_covar = vroom("regenie_covar.txt",show_col_types=F)
+names(df_covar)[1:24]
+vroom_write(df_covar[,c(1:24)],"regenie_covar_20commonpcs.txt")
+{/r}
+
+{bash}
+mkdir bell_test ; mkdir bell_test/rg_out ; mkdir bell_test/hwe_out
+for ((chr=1;chr<=22;chr++)); do \
+  ./plink2 --pfile plink_chr${chr}_allvar_anc_all \
+        --geno 0.1 \
+        --make-pgen --out bell_test/chr${chr}_callqc \
+        --extract bed1 bell_hits.bed ;\
+	awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' bell_test/chr${chr}_callqc.psam > t ;\
+	mv t bell_test/chr${chr}_callqc.psam ;\
+	./plink2 --pfile bell_test/chr${chr}_callqc \
+    	--set-all-var-ids @-#-\$r-\$a --new-id-max-allele-len 10000 \
+    	--missing --hardy midp --out bell_test/hwe_out/chr${chr} ;\
+  ./regenie_v3.2.8.gz_x86_64_Linux --step 2 \
+      --pgen bell_test/chr${chr}_callqc \
+      --phenoFile regenie_pheno.txt \
+      --covarFile regenie_covar_20commonpcs.txt \
+      --bt --firth-se \
+      --firth --approx --pThresh 0.01 \
+      --pred aou_step1_rg_array_anc_all_pred.list \
+      --bsize 400 \
+      --out bell_test/rg_out/chr${chr}_callqc_anc_all_with_approx_all_samples \
+      --minMAC 20 \
+      --phenoCol AD_any ;\
+done
+# organize summ stats into one file
+head -n 1 bell_test/rg_out/chr1_callqc_anc_all_with_approx_all_samples_AD_any.regenie > bell_test/rg_out/bell_hits.txt ;\
+for file in bell_test/rg_out/*.regenie; do \
+    tail -n +2 "$file" >> bell_test/rg_out/bell_hits.txt ;\
+done
+# organize hardy into one file
+head -n 1 bell_test/hwe_out/chr1.hardy > bell_test/hwe_out/hwe_stats.txt ;\
+for file in bell_test/hwe_out/*.hardy; do \
+    tail -n +2 "$file" >> bell_test/hwe_out/hwe_stats.txt ;\
+done
+
+{/bash}
+
+{r}
