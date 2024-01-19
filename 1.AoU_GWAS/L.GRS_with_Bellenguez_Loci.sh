@@ -151,8 +151,8 @@ else \
 fi ;\
 # revise psam file given the empty column being dropped
 if ((curr_chr>=16)); then\
-awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' tmp.psam > t ;\
-mv t tmp.psam ;
+	awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' tmp.psam > t ;\
+	mv t tmp.psam ;
 fi
 
 ./regenie_v3.2.8.gz_x86_64_Linux \
@@ -197,11 +197,23 @@ vroom_write(df_covar[,c(1:24)],"regenie_covar_20commonpcs.txt")
 mkdir bell_test ; mkdir bell_test/rg_out ; mkdir bell_test/hwe_out ; mkdir bell_test/hwe_out_anc ; mkdir bell_test/rg_out_anc
 ancestries=(eur afr amr) # ancestries with adequate sample size
 for ((chr=1;chr<=22;chr++)); do \
-  	./plink2 --pfile plink_chr${chr}_allvar_anc_all \
-        --make-pgen --out bell_test/chr${chr}_callqc \
-        --extract bed1 bell_hits.bed ;\
- 	awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' bell_test/chr${chr}_callqc.psam > t ;\
-	mv t bell_test/chr${chr}_callqc.psam ;\
+	if ((curr_chr>=17)) ; then \
+	    ./plink2 --pfile plink_chr${chr}_multi_split \
+	        --make-pgen --out bell_test/chr${chr}_callqc \
+	        --extract bed1 bell_hits.bed ;\
+	else \
+	    ./plink2 --pfile plink_chr${chr}_multi_split_merged \
+	        --make-pgen --out bell_test/chr${chr}_callqc \
+	        --extract bed1 bell_hits.bed ;\
+	fi ;\
+         if (($chr>=16)); then \ # only run once
+                 awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' bell_test/chr${chr}_callqc.psam > t ;\
+                 mv t bell_test/chr${chr}_callqc.psam ;
+        elif 
+                awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $2 "\t" "NA"}' bell_test/chr${chr}_callqc.psam > t ;\
+                 mv t bell_test/chr${chr}_callqc.psam ;
+        fi
+
 	./plink2 --pfile bell_test/chr${chr}_callqc \
     		--set-all-var-ids @-#-\$r-\$a --new-id-max-allele-len 10000 \
     		--missing --hardy midp --out bell_test/hwe_out/chr${chr} ;\
