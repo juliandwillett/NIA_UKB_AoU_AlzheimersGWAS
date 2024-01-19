@@ -198,35 +198,32 @@ mkdir bell_test ; mkdir bell_test/rg_out ; mkdir bell_test/hwe_out ; mkdir bell_
 ancestries=(eur afr amr) # ancestries with adequate sample size
 for ((chr=1;chr<=22;chr++)); do \
 	if ((curr_chr>=17)) ; then \
-	    ./plink2 --pfile plink_chr${chr}_multi_split \
+	    ./plink2 --pfile plink_chr${chr}_multi_split --geno 0.1 \
 	        --make-pgen --out bell_test/chr${chr}_callqc \
 	        --extract bed1 bell_hits.bed ;\
 	else \
-	    ./plink2 --pfile plink_chr${chr}_multi_split_merged \
+	    ./plink2 --pfile plink_chr${chr}_multi_split_merged --geno 0.1 \
 	        --make-pgen --out bell_test/chr${chr}_callqc \
 	        --extract bed1 bell_hits.bed ;\
 	fi ;\
-         if (($chr>=16)); then \ # only run once
+         if (($chr>=16)); then \ 
                  awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' bell_test/chr${chr}_callqc.psam > t ;\
-                 mv t bell_test/chr${chr}_callqc.psam ;
-        elif 
+                 mv t bell_test/chr${chr}_callqc.psam ; \
+        else \
                 awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $2 "\t" "NA"}' bell_test/chr${chr}_callqc.psam > t ;\
-                 mv t bell_test/chr${chr}_callqc.psam ;
-        fi
-
-	./plink2 --pfile bell_test/chr${chr}_callqc \
-    		--set-all-var-ids @-#-\$r-\$a --new-id-max-allele-len 10000 \
-    		--missing --hardy midp --out bell_test/hwe_out/chr${chr} ;\
-      ./regenie_v3.2.8.gz_x86_64_Linux --step 2 \
-              --pgen bell_test/chr${chr}_callqc \
-              --phenoFile regenie_pheno.txt \
-              --covarFile regenie_covar_20commonpcs.txt \
-              --bt --firth-se \
-              --firth --approx --pThresh 0.01 \
-              --pred aou_step1_rg_array_anc_all_pred.list \
+                 mv t bell_test/chr${chr}_callqc.psam ; \
+        fi \
+        
+        ./plink2 --pfile bell_test/chr${chr}_callqc \
+                --set-all-var-ids @-#-\$r-\$a --new-id-max-allele-len 10000 \
+                --missing --hardy midp --out bell_test/hwe_out/chr${chr} ;\
+      ./regenie_v3.2.8.gz_x86_64_Linux --step 2 --pgen bell_test/chr${chr}_callqc \
+              --phenoFile regenie_pheno.txt --covarFile regenie_covar_20commonpcs.txt \
+              --bt --firth-se --firth --approx --pThresh 0.01 --pred aou_step1_rg_array_anc_all_pred.list \
               --bsize 400 --minMAC 20 --phenoCol AD_any \
               --out bell_test/rg_out/chr${chr}_callqc_anc_all_with_approx_all_samples ;\
-	# do on anc strat data next
+	
+ # do on anc strat data next
  	for anc in "${ancestries[@]}"; do \
                   ./plink2 --pfile bell_test/chr${chr}_callqc --keep ${anc}_ids.txt \
                           --set-all-var-ids @-#-\$r-\$a --new-id-max-allele-len 10000 \
