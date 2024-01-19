@@ -194,38 +194,88 @@ vroom_write(df_covar[,c(1:24)],"regenie_covar_20commonpcs.txt")
 {/r}
 
 {bash}
-mkdir bell_test ; mkdir bell_test/rg_out ; mkdir bell_test/hwe_out
+mkdir bell_test ; mkdir bell_test/rg_out ; mkdir bell_test/hwe_out ; mkdir bell_test/hwe_out_anc ; mkdir bell_test/rg_out_anc
+ancestries=(eur afr amr) # ancestries with adequate sample size
 for ((chr=1;chr<=22;chr++)); do \
-  ./plink2 --pfile plink_chr${chr}_allvar_anc_all \
-        --geno 0.1 \
+  	./plink2 --pfile plink_chr${chr}_allvar_anc_all \
         --make-pgen --out bell_test/chr${chr}_callqc \
         --extract bed1 bell_hits.bed ;\
-	awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' bell_test/chr${chr}_callqc.psam > t ;\
+ 	awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' bell_test/chr${chr}_callqc.psam > t ;\
 	mv t bell_test/chr${chr}_callqc.psam ;\
 	./plink2 --pfile bell_test/chr${chr}_callqc \
-    	--set-all-var-ids @-#-\$r-\$a --new-id-max-allele-len 10000 \
-    	--missing --hardy midp --out bell_test/hwe_out/chr${chr} ;\
-  ./regenie_v3.2.8.gz_x86_64_Linux --step 2 \
-      --pgen bell_test/chr${chr}_callqc \
-      --phenoFile regenie_pheno.txt \
-      --covarFile regenie_covar_20commonpcs.txt \
-      --bt --firth-se \
-      --firth --approx --pThresh 0.01 \
-      --pred aou_step1_rg_array_anc_all_pred.list \
-      --bsize 400 \
-      --out bell_test/rg_out/chr${chr}_callqc_anc_all_with_approx_all_samples \
-      --minMAC 20 \
-      --phenoCol AD_any ;\
+    		--set-all-var-ids @-#-\$r-\$a --new-id-max-allele-len 10000 \
+    		--missing --hardy midp --out bell_test/hwe_out/chr${chr} ;\
+      ./regenie_v3.2.8.gz_x86_64_Linux --step 2 \
+              --pgen bell_test/chr${chr}_callqc \
+              --phenoFile regenie_pheno.txt \
+              --covarFile regenie_covar_20commonpcs.txt \
+              --bt --firth-se \
+              --firth --approx --pThresh 0.01 \
+              --pred aou_step1_rg_array_anc_all_pred.list \
+              --bsize 400 --minMAC 20 --phenoCol AD_any \
+              --out bell_test/rg_out/chr${chr}_callqc_anc_all_with_approx_all_samples ;\
+	# do on anc strat data next
+ 	for anc in "${ancestries[@]}"; do \
+                  ./plink2 --pfile bell_test/chr${chr}_callqc --keep ${anc}_ids.txt \
+                          --set-all-var-ids @-#-\$r-\$a --new-id-max-allele-len 10000 \
+                        --missing --hardy midp --out bell_test/hwe_out_anc/chr${chr}_${anc} ;\
+                awk '{gsub("duplicateofalzheimersgwastake5d1", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_anc_${anc}_pred.list > revised_pred.list
+                ./regenie_v3.2.8.gz_x86_64_Linux --step 2 \
+                         --pgen bell_test/chr${chr}_callqc \
+                         --phenoFile regenie_pheno.txt \
+                         --covarFile regenie_covar_20commonpcs.txt \
+                         --bt --firth-se \
+                         --firth --approx --pThresh 0.01 \
+                         --pred revised_pred.list \
+                         --bsize 400 \
+                         --out bell_test/rg_out_anc/chr${chr}_callqc_anc_${anc}_with_approx_all_samples \
+                         --minMAC 20 --keep ${anc}_ids.txt \
+                         --phenoCol AD_any ;\
+  	done
 done
-# organize summ stats into one file
+### organize summ stats into one file
+# all anc
 head -n 1 bell_test/rg_out/chr1_callqc_anc_all_with_approx_all_samples_AD_any.regenie > bell_test/rg_out/bell_hits.txt ;\
 for file in bell_test/rg_out/*.regenie; do \
     tail -n +2 "$file" >> bell_test/rg_out/bell_hits.txt ;\
 done
-# organize hardy into one file
+# eur
+head -n 1 bell_test/rg_out_anc/chr1_callqc_anc_eur_with_approx_all_samples_AD_any.regenie > bell_test/rg_out_anc/bell_hits_eur.txt ;\
+for file in bell_test/rg_out_anc/*eur_with_approx_all_samples_AD_any.regenie; do \
+    tail -n +2 "$file" >> bell_test/rg_out_anc/bell_hits_eur.txt ;\
+done
+# afr
+head -n 1 bell_test/rg_out_anc/chr1_callqc_anc_afr_with_approx_all_samples_AD_any.regenie > bell_test/rg_out_anc/bell_hits_afr.txt ;\
+for file in bell_test/rg_out_anc/*afr_with_approx_all_samples_AD_any.regenie; do \
+    tail -n +2 "$file" >> bell_test/rg_out_anc/bell_hits_afr.txt ;\
+done
+# amr
+head -n 1 bell_test/rg_out_anc/chr1_callqc_anc_amr_with_approx_all_samples_AD_any.regenie > bell_test/rg_out_anc/bell_hits_amr.txt ;\
+for file in bell_test/rg_out_anc/*amr_with_approx_all_samples_AD_any.regenie; do \
+    tail -n +2 "$file" >> bell_test/rg_out_anc/bell_hits_amr.txt ;\
+done
+
+### organize hardy into one file
+# all anc
 head -n 1 bell_test/hwe_out/chr1.hardy > bell_test/hwe_out/hwe_stats.txt ;\
 for file in bell_test/hwe_out/*.hardy; do \
     tail -n +2 "$file" >> bell_test/hwe_out/hwe_stats.txt ;\
+done
+
+# eur
+head -n 1 bell_test/hwe_out_anc/chr1_eur.hardy > bell_test/hwe_out_anc/hwe_stats_eur.txt ;\
+for file in bell_test/hwe_out_anc/*eur.hardy; do \
+    tail -n +2 "$file" >> bell_test/hwe_out_anc/hwe_stats_eur.txt ;\
+done
+# afr
+head -n 1 bell_test/hwe_out_anc/chr1_afr.hardy > bell_test/hwe_out_anc/hwe_stats_afr.txt ;\
+for file in bell_test/hwe_out_anc/*afr.hardy; do \
+    tail -n +2 "$file" >> bell_test/hwe_out_anc/hwe_stats_afr.txt ;\
+done
+# amr
+head -n 1 bell_test/hwe_out_anc/chr1_amr.hardy > bell_test/hwe_out_anc/hwe_stats_amr.txt ;\
+for file in bell_test/hwe_out_anc/*amr.hardy; do \
+    tail -n +2 "$file" >> bell_test/hwe_out_anc/hwe_stats_amr.txt ;\
 done
 
 {/bash}
