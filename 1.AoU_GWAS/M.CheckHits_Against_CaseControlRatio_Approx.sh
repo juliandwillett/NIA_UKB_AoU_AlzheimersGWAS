@@ -50,7 +50,7 @@ for ((chr=1;chr<=22;chr++)) ; do
     --phenoFile regenie_pheno.txt --covarFile regenie_covar_20commonpcs.txt \
     --bt --firth-se --firth --pThresh 0.01 \
     --pred aou_step1_rg_array_anc_all_pred.list --bsize 400 \
-    --out ccratio_approx_testing/chr${chr}_approx_cc_1_20 \
+    --out ccratio_approx_testing/chr${chr}_notapprox_cc_1_20 \
     --minMAC 20 --phenoCol AD_any ;\
 
     # approx, case:control 1:5
@@ -59,7 +59,7 @@ for ((chr=1;chr<=22;chr++)) ; do
     --phenoFile regenie_pheno_cc_1to5.txt --covarFile regenie_covar_20commonpcs.txt \
     --bt --firth-se --firth --approx --pThresh 0.01 \
     --pred aou_step1_rg_array_anc_all_pred.list --bsize 400 \
-    --out ccratio_approx_testing/chr${chr}_approx_cc_1_20 \
+    --out ccratio_approx_testing/chr${chr}_approx_cc_1_5 \
     --minMAC 20 --phenoCol AD_any ;\
 
     # no approx, case:control 1:5
@@ -68,7 +68,7 @@ for ((chr=1;chr<=22;chr++)) ; do
     --phenoFile regenie_pheno_cc_1to5.txt --covarFile regenie_covar_20commonpcs.txt \
     --bt --firth-se --firth --pThresh 0.01 \
     --pred aou_step1_rg_array_anc_all_pred.list --bsize 400 \
-    --out ccratio_approx_testing/chr${chr}_approx_cc_1_20 \
+    --out ccratio_approx_testing/chr${chr}_notapprox_cc_1_5 \
     --minMAC 20 --phenoCol AD_any ;\
 done
 
