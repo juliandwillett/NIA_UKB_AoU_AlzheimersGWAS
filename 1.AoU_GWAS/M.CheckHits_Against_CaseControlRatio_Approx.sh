@@ -72,4 +72,50 @@ for ((chr=1;chr<=22;chr++)) ; do
     --minMAC 20 --phenoCol AD_any ;\
 done
 
+head -n 1 ccratio_approx_testing/chr1_approx_cc_1_20_AD_any.regenie > aou_hits_approx_cc_1_20.txt ;\
+for file in ccratio_approx_testing/*approx_cc_1_20_AD_any.regenie; do \
+    tail -n +2 "$file" >> aou_hits_approx_cc_1_20.txt ;\
+done
 
+head -n 1 ccratio_approx_testing/chr1_notapprox_cc_1_20_AD_any.regenie > aou_hits_notapprox_cc_1_20.txt ;\
+for file in ccratio_approx_testing/*notapprox_cc_1_20_AD_any.regenie; do \
+    tail -n +2 "$file" >> aou_hits_notapprox_cc_1_20.txt ;\
+done
+
+head -n 1 ccratio_approx_testing/chr1_approx_cc_1_5_AD_any.regenie > aou_hits_approx_cc_1_5.txt ;\
+for file in ccratio_approx_testing/*approx_cc_1_5_AD_any.regenie; do \
+    tail -n +2 "$file" >> aou_hits_approx_cc_1_5.txt ;\
+done
+
+head -n 1 ccratio_approx_testing/chr1_notapprox_cc_1_5_AD_any.regenie > aou_hits_notapprox_cc_1_5.txt ;\
+for file in ccratio_approx_testing/*notapprox_cc_1_5_AD_any.regenie; do \
+    tail -n +2 "$file" >> aou_hits_notapprox_cc_1_5.txt ;\
+done
+
+###########
+# R code to organize the results
+aou_hits = vroom("aou_AD_any_anc_all_gwas_pvals_ids_gwsig.txt",show_col_types=F) %>% arrange(CHROM,GENPOS)
+approx_cc_df = data.frame(ID=aou_hits$ID,P_Approx_120=NA,P_NotApprox_120=NA,P_Approx_15=NA,P_NotApprox_15=NA) 
+approx_120 = vroom("aou_hits_approx_cc_1_20.txt",show_col_types = F) %>% arrange(CHROM,GENPOS) %>% 
+    distinct(ID,.keep_all = T)
+notapprox_120 = vroom("aou_hits_notapprox_cc_1_20.txt",show_col_types = F) %>% arrange(CHROM,GENPOS) %>% 
+    distinct(ID,.keep_all = T)
+approx_15 = vroom("aou_hits_approx_cc_1_5.txt",show_col_types = F) %>% arrange(CHROM,GENPOS) %>% 
+    distinct(ID,.keep_all = T)
+notapprox_15 = vroom("aou_hits_notapprox_cc_1_5.txt",show_col_types = F) %>% arrange(CHROM,GENPOS) %>% 
+    distinct(ID,.keep_all = T)
+
+for (row in 1:nrow(approx_cc_df)) {
+    curr_id = approx_cc_df$ID[[row]]    
+    a120 = which(approx_120$ID == curr_id)
+    na120 = which(notapprox_120$ID == curr_id)
+    a15 = which(approx_15$ID == curr_id)
+    na15 = which(notapprox_15$ID == curr_id)
+    
+    if (length(a120)>0) approx_cc_df$P_Approx_120[[row]] = 10^(-approx_120$LOG10P[[a120]])
+    if (length(na120)>0) approx_cc_df$P_NotApprox_120[[row]] = 10^(-notapprox_120$LOG10P[[na120]])
+    if (length(a15)>0) approx_cc_df$P_Approx_15[[row]] = 10^(-approx_15$LOG10P[[a15]])
+    if (length(na15)>0) approx_cc_df$P_NotApprox_15[[row]] = 10^(-notapprox_15$LOG10P[[na15]])
+}
+head(approx_cc_df)
+vroom_write(approx_cc_df,"aou_hits_approx_vs_cc_1_20_v_1_5_effect.txt")
