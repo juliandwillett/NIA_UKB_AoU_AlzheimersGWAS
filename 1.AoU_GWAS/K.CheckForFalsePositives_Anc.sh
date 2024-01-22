@@ -9,30 +9,29 @@ awk 'NR==1 {print "CHR\tPOS\tPOS" } NR>1 {print $1 "\t" $2 "\t" $2}' aou_AD_any_
 mkdir anc_hwe_test ; mkdir anc_hwe_test/hardy_out/
 
 for ((chr=1;chr<=22;chr++)); do \
-  for anc in "${ancestries[@]}"; do \
-     # Loop through chromosomes to do QC (just call rate)
-     if (($chr>=17)) ; then \
+  if (($chr>=17)) ; then \
       ./plink2 --pfile plink_chr${chr}_multi_split \
           --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
-          --make-pgen --out anc_hwe_test/${chr}_${anc} --new-id-max-allele-len 10000 \
-          --extract bed1 aou_hits.bed --keep ${anc}_ids.txt ;\
+          --make-pgen --out anc_hwe_test/${chr} --new-id-max-allele-len 10000 \
+          --extract bed1 aou_hits.bed ;\
     else \
       ./plink2 --pfile plink_chr${chr}_multi_split_merged \
           --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
-          --make-pgen --out anc_hwe_test/${chr}_${anc} --new-id-max-allele-len 10000 \
-          --extract bed1 aou_hits.bed --keep ${anc}_ids.txt ;\
-    fi ;\
-    if (($chr>=16)); then \ 
-                   awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' anc_hwe_test/${chr}_${anc}.psam > t ;\
-                   mv t anc_hwe_test/${chr}_${anc}.psam ; \
+          --make-pgen --out anc_hwe_test/${chr} --new-id-max-allele-len 10000 \
+          --extract bed1 aou_hits.bed ;\
+  fi ;\
+  if (($chr>=16)); then \ 
+                   awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' anc_hwe_test/${chr}.psam > t ;\
+                   mv t anc_hwe_test/${chr}.psam ; \
     else \
-                  awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $2 "\t" "NA"}' anc_hwe_test/${chr}_${anc}.psam > t ;\
-                   mv t anc_hwe_test/${chr}_${anc}.psam ; \
-    fi ;\
+                  awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $2 "\t" "NA"}' anc_hwe_test/${chr}.psam > t ;\
+                   mv t anc_hwe_test/${chr}.psam ; \
+  fi ;\
 
-    # Next run the hardy testing
-    ./plink2 --pfile anc_hwe_test/${chr}_${anc} \
-      --missing --hardy --out anc_hwe_test/hardy_out/${chr}_${anc} ;\
+  # now do the HWE by ancestry
+  for anc in "${ancestries[@]}"; do \
+    ./plink2 --pfile anc_hwe_test/${chr} --keep ${anc}_ids.txt \
+      --missing --hardy midp --out anc_hwe_test/hardy_out/${chr}_${anc} ;\
   done \
 done
 
