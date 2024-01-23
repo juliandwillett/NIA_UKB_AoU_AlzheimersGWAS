@@ -14,8 +14,13 @@ gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_${curr_chr}_* .
 # Do QC, if it has not been run already. Did not do mind because AoU already flagged individuals and aimed to maximize sample size
 # IMPORTANT: ENSURE THAT FID IID COLUMNS IN RELATED FLAGGED FOR REGENIE FILE MATCH PSAM FILE
 ./plink2 --pfile plink_${curr_chr}_multi_split_merged \
-        --make-pgen --out plink_${curr_chr}_allvar_anc_all \
+        --make-pgen --out plink_chr${chr}_allvar_anc_all \
         --mac 20
+
+# Do extra bit of QC
+./plink2 --pfile plink_out/plink_chr${chr}_allvar_anc_all \
+        --make-pgen --out plink_out/plink_chr${chr}_allvar_anc_all_geno_1e-1 \
+        --mac 20 --geno 0.1
 
 # revise psam file given the empty column being dropped
 awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' plink_${curr_chr}_allvar_anc_all.psam > tmp
@@ -26,35 +31,20 @@ gsutil -m cp -rn $bucket/data/regenie_* .
 gsutil -m cp -rn $bucket/data/regenie/* .
 
 # Rename workspace in pred file, to enable running on parallel workspaces
-awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_norelated_pred.list > revised_pred.list
-
-# Run regenie. I recommend the "--mcc" parameter for additional QC
-./regenie_v3.2.8.gz_x86_64_Linux \
-    --step 2 \
-    --pgen plink_${curr_chr}_allvar_anc_all \
-    --phenoFile regenie_pheno.txt \
-    --covarFile regenie_covar.txt \
-    --bt --firth-se \
-    --firth --approx --pThresh 0.01 \
-    --pred revised_pred.list \
-    --bsize 400 \
-    --out aou_step2_rg_${curr_chr}_firthallvariants \
-    --minMAC 20 \
-    --phenoCol AD_any
+awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_anc_all_pred.list > revised_pred.list
 
 # run regenie for non ancestry stratified in parallel
 for ((chr=1;chr<=22;chr++)); do \
-        curr_chr="chr${chr}" ;\
                 ./regenie_v3.2.8.gz_x86_64_Linux \
                     --step 2 \
-                    --pgen plink_${curr_chr}_allvar_anc_all \
+                    --pgen plink_out/plink_chr${chr}_allvar_anc_all_geno_1e-1 \
                     --phenoFile regenie_pheno.txt \
-                    --covarFile regenie_covar.txt \
+                    --covarFile regenie_covar_20commonpcs.txt \
                     --bt --firth-se \
                     --firth --approx --pThresh 0.01 \
-                    --pred aou_step1_rg_array_common_rare_pcs_pred.list \
+                    --pred aou_step1_rg_array_anc_all_pred.list \
                     --bsize 400 \
-                    --out aou_step2_rg_${curr_chr}_firthallvariants_commonrarepcs \
+                    --out aou_rg_chr${chr}_firthallvar_geno_1e-1_commonpcs
                     --minMAC 20 \
                     --phenoCol AD_any ;\
                 gsutil -m cp -r aou_step2_rg_${curr_chr}_firthallvariants_commonrarepcs* $WORKSPACE_BUCKET/data/rg_results_commonrarepcs/ ;\
