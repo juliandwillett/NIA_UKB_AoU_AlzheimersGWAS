@@ -20,7 +20,7 @@ for ((chr=1;chr<=22;chr++)); do \
           --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
           --make-pgen --out pgen_geno_1e-1_mac_20/chr${chr} --new-id-max-allele-len 10000 ;\
     else \
-      ./plink2 --pfile plink_chr${chr}_multi_split_merged \
+      ./plink2 --pfile pgen_files/plink_chr${chr}_multi_split_merged \
           --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
           --make-pgen --out pgen_geno_1e-1_mac_20/chr${chr} --new-id-max-allele-len 10000 ;\
   fi ;\
