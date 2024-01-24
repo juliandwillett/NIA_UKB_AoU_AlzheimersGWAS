@@ -14,14 +14,14 @@ bucket="gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67"
 gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_* pgen_files/
 
 # Do QC. Did not do mind because AoU already flagged individuals and aimed to maximize sample size
-for ((chr=1;chr<=22;chr++)); do \
+for ((chr=4;chr<=22;chr++)); do \
   if (($chr>=17)) ; then \
       ./plink2 --pfile pgen_files/plink_chr${chr}_multi_split \
-          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
+          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 --memory 200000 \
           --make-pgen --out pgen_geno_1e-1_mac_20/chr${chr} --new-id-max-allele-len 10000 ;\
     else \
       ./plink2 --pfile pgen_files/plink_chr${chr}_multi_split_merged \
-          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
+          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 --memory 200000 \
           --make-pgen --out pgen_geno_1e-1_mac_20/chr${chr} --new-id-max-allele-len 10000 ;\
   fi ;\
   if (($chr>=16)); then \ 
