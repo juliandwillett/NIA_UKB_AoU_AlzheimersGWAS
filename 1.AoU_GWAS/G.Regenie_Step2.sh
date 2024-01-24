@@ -6,24 +6,32 @@ unzip plink2_linux*
 wget https://github.com/rgcgithub/regenie/releases/download/v3.2.8/regenie_v3.2.8.gz_x86_64_Linux.zip
 unzip regenie_v3.2.8.gz_x86_64_Linux.zip
 
+# Make requisite folders
+mkdir pgen_files ; mkdir pgen_geno_1e-1_mac_20
+
 # Get files for current chromosome
 bucket="gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67"
 gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_* pgen_files/
 
-# Do QC, if it has not been run already. Did not do mind because AoU already flagged individuals and aimed to maximize sample size
-# IMPORTANT: ENSURE THAT FID IID COLUMNS IN RELATED FLAGGED FOR REGENIE FILE MATCH PSAM FILE
-./plink2 --pfile plink_${curr_chr}_multi_split_merged \
-        --make-pgen --out plink_chr${chr}_allvar_anc_all \
-        --mac 20
-
-# Do extra bit of QC
-./plink2 --pfile plink_out/plink_chr${chr}_allvar_anc_all \
-        --make-pgen --out plink_out/plink_chr${chr}_allvar_anc_all_geno_1e-1 \
-        --mac 20 --geno 0.1
-
-# revise psam file given the empty column being dropped
-awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' plink_${curr_chr}_allvar_anc_all.psam > tmp
-mv tmp plink_${curr_chr}_allvar_anc_all.psam
+# Do QC. Did not do mind because AoU already flagged individuals and aimed to maximize sample size
+for ((chr=1;chr<=22;chr++)); do \
+  if (($chr>=17)) ; then \
+      ./plink2 --pfile pgen_files/plink_chr${chr}_multi_split \
+          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
+          --make-pgen --out pgen_geno_1e-1_mac_20/chr${chr} --new-id-max-allele-len 10000 ;\
+    else \
+      ./plink2 --pfile plink_chr${chr}_multi_split_merged \
+          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
+          --make-pgen --out pgen_geno_1e-1_mac_20/chr${chr} --new-id-max-allele-len 10000 ;\
+  fi ;\
+  if (($chr>=16)); then \ 
+                   awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' pgen_geno_1e-1_mac_20/chr${chr}.psam > t ;\
+                   mv t pgen_geno_1e-1_mac_20/chr${chr}.psam ; \
+    else \
+                  awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $2 "\t" "NA"}' pgen_geno_1e-1_mac_20/chr${chr}.psam > t ;\
+                   mv t pgen_geno_1e-1_mac_20/chr${chr}.psam ; \
+  fi ;\
+done
 
 # Get files for pheno/covar/step1
 gsutil -m cp -rn $bucket/data/regenie_* .
