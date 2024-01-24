@@ -8,8 +8,7 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip
 
 # Get files for current chromosome
 bucket="gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67"
-curr_chr="chr19"
-gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_${curr_chr}_* .
+gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_* pgen_files/
 
 # Do QC, if it has not been run already. Did not do mind because AoU already flagged individuals and aimed to maximize sample size
 # IMPORTANT: ENSURE THAT FID IID COLUMNS IN RELATED FLAGGED FOR REGENIE FILE MATCH PSAM FILE
