@@ -7,21 +7,21 @@ wget https://github.com/rgcgithub/regenie/releases/download/v3.2.8/regenie_v3.2.
 unzip regenie_v3.2.8.gz_x86_64_Linux.zip
 
 # Make requisite folders
-mkdir pgen_files ; mkdir pgen_geno_1e-1_mac_20
+mkdir pgen_files ; mkdir pgen_geno_1e-1_mac_20 ; mkdir rg_multi_geno_1e-1_mac_20
 
 # Get files for current chromosome
 bucket="gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67"
 gsutil -m cp -rn $bucket/data/pgen_minimal_qc/plink_* pgen_files/
 
 # Do QC. Did not do mind because AoU already flagged individuals and aimed to maximize sample size
-for ((chr=4;chr<=22;chr++)); do \
+for ((chr=5;chr<=22;chr++)); do \
   if (($chr>=17)) ; then \
       ./plink2 --pfile pgen_files/plink_chr${chr}_multi_split \
-          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 --memory 200000 \
+          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 --memory 300000 \
           --make-pgen --out pgen_geno_1e-1_mac_20/chr${chr} --new-id-max-allele-len 10000 ;\
     else \
       ./plink2 --pfile pgen_files/plink_chr${chr}_multi_split_merged \
-          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 --memory 200000 \
+          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 --memory 300000 \
           --make-pgen --out pgen_geno_1e-1_mac_20/chr${chr} --new-id-max-allele-len 10000 ;\
   fi ;\
   if (($chr>=16)); then \ 
@@ -40,21 +40,21 @@ gsutil -m cp -rn $bucket/data/regenie/* .
 # Rename workspace in pred file, to enable running on parallel workspaces
 awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_anc_all_pred.list > revised_pred.list
 
-# run regenie for non ancestry stratified in parallel
+# run regenie for non ancestry stratified in parallel. While not QC'd on HWE for step 2, HWE QC was done for step 1 to get population structure 
 for ((chr=1;chr<=22;chr++)); do \
                 ./regenie_v3.2.8.gz_x86_64_Linux \
                     --step 2 \
-                    --pgen plink_out/plink_chr${chr}_allvar_anc_all_geno_1e-1 \
+                    --pgen pgen_geno_1e-1_mac_20/chr${chr} \
                     --phenoFile regenie_pheno.txt \
-                    --covarFile regenie_covar_20commonpcs.txt \
+                    --covarFile regenie_covar_20pcs.txt \
                     --bt --firth-se \
                     --firth --approx --pThresh 0.01 \
-                    --pred aou_step1_rg_array_anc_all_pred.list \
+                    --pred revised_pred.list \
                     --bsize 400 \
-                    --out aou_rg_chr${chr}_firthallvar_geno_1e-1_commonpcs
+                    --out rg_multi_geno_1e-1_mac_20/chr${chr}
                     --minMAC 20 \
                     --phenoCol AD_any ;\
-                gsutil -m cp -r aou_step2_rg_${curr_chr}_firthallvariants_commonrarepcs* $WORKSPACE_BUCKET/data/rg_results_commonrarepcs/ ;\
+        gsutil -m cp -r rg_multi_geno_1e-1_mac_20/chr${chr}* $bucket/data/rg_results_20commonpcs_geno_1e-1_mac_20_no_hwe/ ;\
 done
 
 # run regenie for ancestry-stratified cohorts
