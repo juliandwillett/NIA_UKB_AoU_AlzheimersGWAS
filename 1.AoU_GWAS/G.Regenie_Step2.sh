@@ -41,7 +41,7 @@ gsutil -m cp -rn $bucket/data/regenie/* .
 awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_anc_all_pred.list > revised_pred.list
 
 # run regenie for non ancestry stratified in parallel. While not QC'd on HWE for step 2, HWE QC was done for step 1 to get population structure 
-for ((chr=1;chr<=22;chr++)); do \
+for ((chr=3;chr<=22;chr++)); do \
                 ./regenie_v3.2.8.gz_x86_64_Linux \
                     --step 2 \
                     --pgen pgen_geno_1e-1_mac_20/chr${chr} \
@@ -51,7 +51,7 @@ for ((chr=1;chr<=22;chr++)); do \
                     --firth --approx --pThresh 0.01 \
                     --pred revised_pred.list \
                     --bsize 400 \
-                    --out rg_multi_geno_1e-1_mac_20/chr${chr}
+                    --out rg_multi_geno_1e-1_mac_20/chr${chr} \
                     --minMAC 20 \
                     --phenoCol AD_any ;\
         gsutil -m cp -r rg_multi_geno_1e-1_mac_20/chr${chr}* $bucket/data/rg_results_20commonpcs_geno_1e-1_mac_20_no_hwe/ ;\
