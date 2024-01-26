@@ -9,6 +9,7 @@ unzip regenie_v3.2.8.gz_x86_64_Linux.zip
 
 # Make requisite folders
 mkdir pgen_files ; mkdir pgen_geno_1e-1_mac_20 ; mkdir rg_multi_geno_1e-1_mac_20
+mkdir rg_multi_geno_1e-1_mac_20_for_export
 
 # Get files for current chromosome
 bucket="gs://fc-secure-4029af59-df13-4d1b-b22c-2ae64cb3dc67"
