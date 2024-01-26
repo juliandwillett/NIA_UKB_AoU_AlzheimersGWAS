@@ -59,7 +59,17 @@ for ((chr=3;chr<=22;chr++)); do \
         gsutil -m cp -r rg_multi_geno_1e-1_mac_20/chr${chr}* $bucket/data/rg_results_20commonpcs_geno_1e-1_mac_20_no_hwe/ ;\
 done
 
-# run regenie for ancestry-stratified cohorts
+### run regenie for ancestry-stratified cohorts
+# produce files with FID/IID for each ancestry (determined by AoU)
+mkdir ancestries
+gsutil -u $GOOGLE_PROJECT -m cp -rn gs://fc-aou-datasets-controlled/v7/wgs/short_read/snpindel/aux/ancestry/ancestry_preds.tsv ancestries/
+ancestries=(eur afr amr sas eas mid) ;\
+for anc in "${ancestries[@]}"; do \
+  awk -v a="$anc" '$2 == a {print "0\t" $1 "\t" $2}' ancestries/ancestry_preds.tsv > ancestries/${anc}_ids.txt ;\
+done
+gsutil -m cp -rn ancestries/*ids.txt $bucket/data/ancestry_ids/
+
+# get backed up data and run
 gsutil cp $WORKSPACE_BUCKET/data/*_ids.txt .
 ancestries=(eur afr amr)
 for ((chr=1;chr<=22;chr++)); do \
@@ -77,7 +87,7 @@ for ((chr=1;chr<=22;chr++)); do \
                     --bsize 400 \
                     --out aou_step2_rg_${curr_chr}_firthallvariants_${anc} \
                     --minMAC 20 \
-                    --phenoCol AD_any --keep ${anc}_ids.txt ;\
+                    --phenoCol AD_any --keep ancestries/${anc}_ids.txt ;\
                 gsutil -m cp -r aou_step2_rg_${curr_chr}_firthallvariants_${anc}* $WORKSPACE_BUCKET/data/rg_results_rel_anc_strat/ ;\
         done  
 done
