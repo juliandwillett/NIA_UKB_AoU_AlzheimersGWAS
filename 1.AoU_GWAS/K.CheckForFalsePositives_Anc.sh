@@ -4,50 +4,22 @@
 # So all we need are the HWE p values for single-ancestry cohorts
 
 # Prepare bed file
-ancestries=(eur afr amr)
-awk 'NR==1 {print "CHR\tPOS\tPOS" } NR>1 {print $1 "\t" $2 "\t" $2}' aou_AD_any_anc_all_gwas_pvals_ids_gwsig.txt > aou_hits.bed
-mkdir anc_hwe_test ; mkdir anc_hwe_test/hardy_out/
+mkdir hwe_testing ; mkdir hwe_testing/hardy_out/
+ancestries=(eur afr amr sas eas mid)
+awk 'NR==1 {print "CHR\tPOS\tPOS" } NR>1 {print $1 "\t" $2 "\t" $2}' aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_gwsig.txt > hwe_testing/aou_hits.bed
 
+# Run the hardy calculations
 for ((chr=1;chr<=22;chr++)); do \
-  if (($chr>=17)) ; then \
-      ./plink2 --pfile plink_chr${chr}_multi_split \
-          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
-          --make-pgen --out anc_hwe_test/${chr} --new-id-max-allele-len 10000 \
-          --extract bed1 aou_hits.bed ;\
-    else \
-      ./plink2 --pfile plink_chr${chr}_multi_split_merged \
-          --geno 0.1 --set-all-var-ids @-#-\$r-\$a --mac 20 \
-          --make-pgen --out anc_hwe_test/${chr} --new-id-max-allele-len 10000 \
-          --extract bed1 aou_hits.bed ;\
-  fi ;\
-  if (($chr>=16)); then \ 
-                   awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' anc_hwe_test/${chr}.psam > t ;\
-                   mv t anc_hwe_test/${chr}.psam ; \
-    else \
-                  awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $2 "\t" "NA"}' anc_hwe_test/${chr}.psam > t ;\
-                   mv t anc_hwe_test/${chr}.psam ; \
-  fi ;\
-
-  # now do the HWE by ancestry
   for anc in "${ancestries[@]}"; do \
-    ./plink2 --pfile anc_hwe_test/${chr} --keep ${anc}_ids.txt \
-      --missing --hardy midp --out anc_hwe_test/hardy_out/${chr}_${anc} ;\
+    ./plink2 --pfile pgen_geno_1e-1_mac_20/chr${chr} --keep ancestries/${anc}_ids.txt \
+      --missing --hardy midp --out hwe_testing/hardy_out/${chr}_${anc} --extract bed1 hwe_testing/aou_hits.bed ;\
   done \
 done
 
 # Then merge the output
-# eur
-head -n 1 anc_hwe_test/hardy_out/1_eur.hardy > anc_hwe_test/hardy_out/eur_hwe_stats.txt ;\
-for file in anc_hwe_test/hardy_out/*eur.hardy; do \
-    tail -n +2 "$file" >> anc_hwe_test/hardy_out/eur_hwe_stats.txt ;\
-done
-# afr
-head -n 1 anc_hwe_test/hardy_out/1_afr.hardy > anc_hwe_test/hardy_out/afr_hwe_stats.txt ;\
-for file in anc_hwe_test/hardy_out/*afr.hardy; do \
-    tail -n +2 "$file" >> anc_hwe_test/hardy_out/afr_hwe_stats.txt ;\
-done
-# amr
-head -n 1 anc_hwe_test/hardy_out/1_amr.hardy > anc_hwe_test/hardy_out/amr_hwe_stats.txt ;\
-for file in anc_hwe_test/hardy_out/*amr.hardy; do \
-    tail -n +2 "$file" >> anc_hwe_test/hardy_out/amr_hwe_stats.txt ;\
+for anc in "${ancestries[@]}"; do \
+  head -n 1 hwe_testing/hardy_out/1_${anc}.hardy > hwe_testing/hardy_out/${anc}_hwe_stats.txt ;\
+  for file in hwe_testing/hardy_out/*${anc}.hardy; do \
+    tail -n +2 "$file" >> hwe_testing/hardy_out/${anc}_hwe_stats.txt ;\
+  done \
 done
