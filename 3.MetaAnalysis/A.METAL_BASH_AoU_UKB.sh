@@ -1,6 +1,6 @@
 # first ensure the ID columns are the same format in GWAS files, and create a P value column
-awk -v OFS='\t' 'NR==1 {print $0 "\tPval"} NR>1 {$15 = 10^(-1 * $12); print }' aou_AD_any_anc_all_gwas.txt > aou_AD_any_anc_all_gwas_pvals.txt
-awk -v OFS='\t' 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' aou_AD_any_anc_all_gwas_pvals.txt > aou_AD_any_anc_all_gwas_pvals_ids.txt #necessary to make meta analysis work
+awk -v OFS='\t' 'NR==1 {print $0 "\tPval"} NR>1 {$15 = 10^(-1 * $12); print }' /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs.txt > /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals.txt
+awk -v OFS='\t' 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' aou_AD_any_anc_all_gwas_pvals.txt > aou_AD_any_anc_all_gwas_pvals_ids.txt # split multiallelics have "." as ID, so fix this
 
 # Add p val, IDs column to UKB
 awk -v OFS='\t' 'NR==1 { $14 = "Pval"; print} NR>1 {$3 = $1 ":" $2 ":" $4 "," $5; $14 = 10^(-1 * $12); print }' \
