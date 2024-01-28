@@ -72,24 +72,13 @@ for ((chr=1;chr<=22;chr++)) ; do
     --minMAC 20 --phenoCol AD_any ;\
 done
 
-head -n 1 ccratio_approx_testing/chr1_approx_cc_1_20_AD_any.regenie > aou_hits_approx_cc_1_20.txt ;\
-for file in ccratio_approx_testing/*approx_cc_1_20_AD_any.regenie; do \
-    tail -n +2 "$file" >> aou_hits_approx_cc_1_20.txt ;\
-done
-
-head -n 1 ccratio_approx_testing/chr1_notapprox_cc_1_20_AD_any.regenie > aou_hits_notapprox_cc_1_20.txt ;\
-for file in ccratio_approx_testing/*notapprox_cc_1_20_AD_any.regenie; do \
-    tail -n +2 "$file" >> aou_hits_notapprox_cc_1_20.txt ;\
-done
-
-head -n 1 ccratio_approx_testing/chr1_approx_cc_1_5_AD_any.regenie > aou_hits_approx_cc_1_5.txt ;\
-for file in ccratio_approx_testing/*approx_cc_1_5_AD_any.regenie; do \
-    tail -n +2 "$file" >> aou_hits_approx_cc_1_5.txt ;\
-done
-
-head -n 1 ccratio_approx_testing/chr1_notapprox_cc_1_5_AD_any.regenie > aou_hits_notapprox_cc_1_5.txt ;\
-for file in ccratio_approx_testing/*notapprox_cc_1_5_AD_any.regenie; do \
-    tail -n +2 "$file" >> aou_hits_notapprox_cc_1_5.txt ;\
+names=(approx_cc_1_20 notapprox_cc_1_20 approx_cc_1_5 notapprox_cc_1_5) ;\
+for name in "${names[@]}"; do \
+  echo $name ;\
+  head -n 1 ccratio_approx_testing/chr1_${name}_AD_any.regenie > ccratio_approx_testing/aou_hits_${name}.txt ;\
+  for file in ccratio_approx_testing/*${name}_AD_any.regenie; do \
+      tail -n +2 "$file" >> ccratio_approx_testing/aou_hits_${name}.txt ;\
+  done \
 done
 
 ###########
