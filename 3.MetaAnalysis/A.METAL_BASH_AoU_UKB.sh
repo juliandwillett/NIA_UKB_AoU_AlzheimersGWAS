@@ -8,8 +8,8 @@ awk -v OFS='\t' 'NR==1 { $14 = "Pval"; print} NR>1 {$3 = $1 ":" $2 ":" $4 "," $5
 /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_pval_ensure20.txt
 
 # Run a script with the METAL parameters
-salloc -p test --mem 80000 -t 0-02:00 -n 4
-metal METAL_script.txt
+salloc -p test --mem 80000 -t 0-04:00 -n 6
+metal METAL_script_AOU_UKB.txt
 
 # functions to clean up data for further processing and expedite analysis (intersections with single GWAS, for example)
 mv METAANALYSIS1.TBL aou_ukb_allvar_meta_analysis.TBL
