@@ -23,3 +23,29 @@ for anc in "${ancestries[@]}"; do \
     tail -n +2 "$file" >> hwe_testing/hardy_out/${anc}_hwe_stats.txt ;\
   done \
 done
+
+# Rcode for producing a table for these results
+aou_hits = vroom("aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_gwsig.txt",show_col_types=F) %>% 
+    arrange(CHROM,GENPOS) 
+anc_hwe = data.frame(ID=aou_hits$ID,MIDP_EUR=NA,MIDP_AFR=NA,MIDP_AMR=NA,MIDP_EAS=NA,MIDP_SAS=NA,MIDP_MID=NA) 
+
+hwe_datasets = lapply(X = c("eur","afr","amr","eas","sas","mid"),FUN = function(x) {
+    vroom(glue("hwe_testing/hardy_out/{x}_hwe_stats.txt"),show_col_types = F) %>% 
+    distinct(ID,.keep_all = T)
+})
+
+for (row in 1:nrow(anc_hwe)) {
+    curr_id = anc_hwe$ID[[row]]    
+    for (anc in c(1:6)) {
+        curr_anc_id = which(hwe_datasets[[anc]]$ID == curr_id)
+        if (length(curr_anc_id) > 0)
+            anc_hwe[[row,(1+anc)]] = hwe_datasets[[anc]]$MIDP[[curr_anc_id]]
+    }
+}
+head(anc_hwe)
+vroom_write(anc_hwe,"anc_hwe_midp.txt")
+
+print(nrow(anc_hwe))
+print(nrow(anc_hwe %>% filter(MIDP_EUR <= 1e-15 | MIDP_AFR <= 1e-15 | MIDP_AMR <= 1e-15 |
+                             MIDP_EAS <= 1e-15 | MIDP_SAS <= 1e-15 | MIDP_MID <= 1e-15)))
+print(nrow(anc_hwe %>% filter(MIDP_EUR <= 1e-15 | MIDP_AFR <= 1e-15 | MIDP_AMR <= 1e-15)))
