@@ -83,28 +83,24 @@ done
 
 ###########
 # R code to organize the results
-aou_hits = vroom("aou_AD_any_anc_all_gwas_pvals_ids_gwsig.txt",show_col_types=F) %>% arrange(CHROM,GENPOS)
+aou_hits = vroom("aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_gwsig.txt",show_col_types=F) %>% 
+    arrange(CHROM,GENPOS)
 approx_cc_df = data.frame(ID=aou_hits$ID,P_Approx_120=NA,P_NotApprox_120=NA,P_Approx_15=NA,P_NotApprox_15=NA) 
-approx_120 = vroom("aou_hits_approx_cc_1_20.txt",show_col_types = F) %>% arrange(CHROM,GENPOS) %>% 
-    distinct(ID,.keep_all = T)
-notapprox_120 = vroom("aou_hits_notapprox_cc_1_20.txt",show_col_types = F) %>% arrange(CHROM,GENPOS) %>% 
-    distinct(ID,.keep_all = T)
-approx_15 = vroom("aou_hits_approx_cc_1_5.txt",show_col_types = F) %>% arrange(CHROM,GENPOS) %>% 
-    distinct(ID,.keep_all = T)
-notapprox_15 = vroom("aou_hits_notapprox_cc_1_5.txt",show_col_types = F) %>% arrange(CHROM,GENPOS) %>% 
-    distinct(ID,.keep_all = T)
+
+options = c("approx_cc_1_20","notapprox_cc_1_20","approx_cc_1_5","notapprox_cc_1_5")
+approx_data = lapply(X = options,
+                     FUN = function(x) {
+                         vroom(glue("ccratio_approx_testing/aou_hits_{x}.txt"),show_col_types=F) %>%
+                             arrange(CHROM,GENPOS) %>% distinct(ID,.keep_all=T)
+                     })
 
 for (row in 1:nrow(approx_cc_df)) {
     curr_id = approx_cc_df$ID[[row]]    
-    a120 = which(approx_120$ID == curr_id)
-    na120 = which(notapprox_120$ID == curr_id)
-    a15 = which(approx_15$ID == curr_id)
-    na15 = which(notapprox_15$ID == curr_id)
-    
-    if (length(a120)>0) approx_cc_df$P_Approx_120[[row]] = 10^(-approx_120$LOG10P[[a120]])
-    if (length(na120)>0) approx_cc_df$P_NotApprox_120[[row]] = 10^(-notapprox_120$LOG10P[[na120]])
-    if (length(a15)>0) approx_cc_df$P_Approx_15[[row]] = 10^(-approx_15$LOG10P[[a15]])
-    if (length(na15)>0) approx_cc_df$P_NotApprox_15[[row]] = 10^(-notapprox_15$LOG10P[[na15]])
+    for (op in 1:4) {
+        curr_opt = which(approx_data[[op]]$ID == curr_id)
+        if (length(curr_opt) > 0) 
+            approx_cc_df[[row,1+op]] = 10^(-approx_data[[op]]$LOG10P[[curr_opt]])
+    }
 }
 head(approx_cc_df)
 vroom_write(approx_cc_df,"aou_hits_approx_vs_cc_1_20_v_1_5_effect.txt")
