@@ -4,7 +4,8 @@
 # So all we need are the HWE p values for single-ancestry cohorts
 
 mkdir hwe_testing ; mkdir hwe_testing/hardy_out/
-ancestries=(eur afr amr sas eas mid)
+awk '{print $1 "\t" $2}' pgen_geno_1e-1_mac_20/chr1.psam > ancestries/all_ids.txt
+ancestries=(all eur afr amr sas eas mid)
 
 # First get the hits from all analyses (GWAS1, GWAS2, Meta), produce bed file. {R}
 meta_hits = vroom("/n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL")
@@ -23,7 +24,7 @@ vroom_write(bed_file,"all_study_hits.bed")
 for ((chr=1;chr<=22;chr++)); do \
   for anc in "${ancestries[@]}"; do \
     ./plink2 --pfile pgen_geno_1e-1_mac_20/chr${chr} --keep ancestries/${anc}_ids.txt \
-      --missing --hardy midp --out hwe_testing/hardy_out/${chr}_${anc} --extract bed1 hwe_testing/aou_hits.bed ;\
+      --missing --hardy midp --out hwe_testing/hardy_out/${chr}_${anc} --extract bed1 all_study_hits.bed ;\
   done \
 done
 
