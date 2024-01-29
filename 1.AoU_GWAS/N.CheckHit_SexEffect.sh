@@ -11,7 +11,7 @@ awk '$4 == 1 {print $1 "\t" $2}' regenie_covar_20commonpcs.txt > male_ids.txt # 
 
 for ((chr=1;chr<=22;chr++)); do \
   ./plink2 --pfile pgen_geno_1e-1_mac_20/chr${chr} \
-      --make-pgen --out sex_eval/${chr} --extract bed1 hwe_testing/aou_hits.bed ;\
+      --make-pgen --out sex_eval/${chr} --extract bed1 all_study_hits.bed ;\
   awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' sex_eval/${chr}.psam > t ;\
   mv t sex_eval/${chr}.psam ;\
   ./regenie_v3.2.8.gz_x86_64_Linux --step 2 --pgen sex_eval/${chr} \
