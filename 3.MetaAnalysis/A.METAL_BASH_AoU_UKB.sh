@@ -15,11 +15,11 @@ metal METAL_script_AOU_UKB.txt
 mv METAANALYSIS1.TBL aou_ukb_allvar_meta_analysis.TBL
 
 # Add CHR, POS, and FAVOR_ID columns, to make sorting easier and enable later intersections (ie intersection with Bellenguez et al for comparison)
-awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0 "\tCHR\tPOS\tID\tIDrev"} NR>1 {split($1, values, ":"); $16 = values[1]; $17 = values[2]; $18 = $16 "-" $17 "-" toupper($2) "-" toupper($3); $19 = $16 "-" $17 "-" toupper($3) "-" toupper($2); $20 = $16 "-" $17; print $0}' \
+awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0 "\tCHR\tPOS\tIDrev"} NR>1 {split($1, values, "-"); $16 = values[1]; $17 = values[2]; $18 = $16 "-" $17 "-" toupper($3) "-" toupper($2); $20 = $16 "-" $17; print $0}' \
   aou_ukb_allvar_meta_analysis.TBL > aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL
 
 # Isolate GW significant hits to focus the analysis (and make R code work more efficiently)
-awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0} NR>1 && $10 <= 5e-8 {print $0}' aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL > \
+awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0} NR>1 && $10 <= 5e-8 && $1 != 23 {print $0}' aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL > \
   aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL
 
 # to make intersect reference file: in R
