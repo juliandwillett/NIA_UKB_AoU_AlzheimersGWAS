@@ -23,29 +23,29 @@ awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0} NR>1 && $10 <= 5e-8 && $1 != 23 {p
   aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL
 
 # to make intersect reference file: in R
-data = vroom("aou_ukb_allvar_meta_qc_sorted_gwsig.txt")
-data %<>% mutate(CHRPOS = glue("{CHR}-{POS}"))
+data = vroom("aou_ukb_allvar_meta_qc_sorted_gwsig.txt") %>%  mutate(CHRPOS = glue("{CHR}-{POS}"))
 vroom_write(data,"meta_hits_for_intersects_aou_vs_ukb.txt")
 
-# Intersect the meta significant hits with each GWAS to make getting p values more efficient
-awk 'NR==FNR{arr[$19]; next} $16 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_AD_any_anc_all_gwas_pvals_ids_chrompos_firthse_ensure20.txt > \
+# Intersect the meta significant hits with each GWAS to make getting p values more efficient. Start with AoU here
+awk 'NR==1 {$16 = "CHRPOS"; print} NR>1 {$16 = $1 "-" $2; print}' \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals.txt > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt
+awk 'NR==FNR{arr[$18]; next} $16 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt > \
   meta_hits_aou_intersect_aou_vs_ukb.txt
-awk 'NR==1 {$14 = "CHROMPOS"; print} NR>1 {$14 = $1 "-" $2; print}' /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_ensure20.txt > \
-  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_ensure20_chrpos.txt
-awk 'NR==FNR{arr[$19]; next} $14 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_ensure20_chrpos.txt > \
+
+# Do the same for UKB
+awk 'NR==1 {$15 = "CHRPOS"; print} NR>1 {$15 = $1 "-" $2; print}' \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_hyphen_ids_pvals.regenie > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_hyphen_ids_pvals_chrpos.regenie
+awk 'NR==FNR{arr[$18]; next} $15 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_hyphen_ids_pvals_chrpos.regenie > \
   meta_hits_ukb_intersect_aou_vs_ukb.txt
 
 # Intersect with NIAGADS to check for mutual hits
-awk 'NR==FNR{arr[$19]; next} $15 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
+awk 'NR==FNR{arr[$18]; next} $15 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
   /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos.txt > \
   meta_hits_niagads_intersect_aou_vs_ukb.txt
-
-# Also intersect with Bellenguez sumstats to speed up checking for mutual hits, re concern for FP
-awk 'NR==FNR{arr[$19]; next} $18 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/Other_GWAS/bellengeuz_meta_ids_chrpos.tsv > \
-  meta_hits_bell_intersect_aou_vs_ukb.txt
 
 # Then make files for Manhattan to ensure efficiency
 awk 'NR==1 {print $0} NR>1 && $16 < 23 && $7 - $6 < 0.4 && $10 < 1e-3 {print $0}' \
