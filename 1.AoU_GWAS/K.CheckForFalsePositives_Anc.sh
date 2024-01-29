@@ -3,10 +3,20 @@
 #   removing hits that did not pass HWE in single-ancestry data.
 # So all we need are the HWE p values for single-ancestry cohorts
 
-# Prepare bed file
 mkdir hwe_testing ; mkdir hwe_testing/hardy_out/
 ancestries=(eur afr amr sas eas mid)
-awk 'NR==1 {print "CHR\tPOS\tPOS" } NR>1 {print $1 "\t" $2 "\t" $2}' aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_gwsig.txt > hwe_testing/aou_hits.bed
+
+# First get the hits from all analyses (GWAS1, GWAS2, Meta), produce bed file.
+meta_hits = vroom("/n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL")
+ukb_hits = vroom("/n/holystore01/LABS/tanzi_lab/Lab/UKBiobank/WGS_results/all_variants_200k_hyphen_ids_pvals_gwsig.regenie")
+aou_hits = vroom("/n/holystore01/LABS/tanzi_lab/Lab/AoU/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_gwsig.txt")
+hits_ids = data.frame(ID=aou_hits$ID) %>% add_row(ID=meta_hits$MarkerName) %>% add_row(ID=ukb_hits$ID) %>% distinct()
+hits_id = hits_id %>% separate(ID,into=c("CHR","POS","A0","A1"),sep="-")
+bed_file = data.frame(CHR=hits_id_split$CHR,POSS = hits_id_split$POS,POSE = hits_id_split$POS)
+vroom_write(bed_file,"all_study_hits.bed")
+
+# Prepare bed file (if testing a single GWAS, i.e. AoU)
+#awk 'NR==1 {print "CHR\tPOS\tPOS" } NR>1 {print $1 "\t" $2 "\t" $2}' aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_gwsig.txt > hwe_testing/aou_hits.bed
 
 # Run the hardy calculations
 for ((chr=1;chr<=22;chr++)); do \
