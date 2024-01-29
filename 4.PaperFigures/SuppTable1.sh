@@ -9,3 +9,5 @@ for anc in "${ancestries[@]}"; do # first file is pheno file, second is IDs \
   awk 'NR==FNR{arr[$2]; next} $2 in arr' ancestries/${anc}_ids.txt regenie_pheno.txt | awk '$4 == 1 {print}' | wc -l >> supp_table_1_counts.txt ;\
   awk 'NR==FNR{arr[$2]; next} $2 in arr' ancestries/${anc}_ids.txt regenie_pheno.txt | awk '$4 == 0 {print}' | wc -l >> supp_table_1_counts.txt ;\
 done
+
+cat supp_table_1_counts.txt
