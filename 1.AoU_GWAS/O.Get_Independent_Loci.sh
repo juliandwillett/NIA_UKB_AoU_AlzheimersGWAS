@@ -16,6 +16,8 @@ separate_loci = function(df) {
 ######################################
 # Then bring this data into AoU (in a zip file)
 unzip locus_hits.zip
+mkdir locus_hits/beds/
 for file in locus_hits/*.txt ; do \
-
+  awk '{print $5 "\t" $6 "\t" $6}' $file > locus_hits/beds/$file.bed
+  ./plink2 --pgen pgen_geno_1e-1_mac_20/chr${chr}
 done
