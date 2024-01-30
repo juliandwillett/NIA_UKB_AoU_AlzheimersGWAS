@@ -61,3 +61,61 @@ print(nrow(anc_hwe))
 print(nrow(anc_hwe %>% filter(MIDP_EUR <= 1e-15 | MIDP_AFR <= 1e-15 | MIDP_AMR <= 1e-15 |
                              MIDP_EAS <= 1e-15 | MIDP_SAS <= 1e-15 | MIDP_MID <= 1e-15)))
 print(nrow(anc_hwe %>% filter(MIDP_EUR <= 1e-15 | MIDP_AFR <= 1e-15 | MIDP_AMR <= 1e-15)))
+
+####################################
+# To then give this file columns with single-ancestry regenie p-values, use the following:
+ancestries=(all eur afr amr) ;\
+for anc in "${ancestries[@]}"; do \
+  echo $anc ;\
+  awk 'NR==1 {$16 = "Pval"; $17 = "CHRPOS"; $18 = "IDrev"; print} NR>1 {$3 = $1 "-" $2 "-" $4 "-" $5; \
+    $16 = 10^(-1 * $12); $17 = $1 "-" $2; $18 = $1 "-" $2 "-" $5 "-" $4; print}' \
+    /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/AncStrat_BT/aou_AD_any_anc_${anc}_gwas.txt > \
+    /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/AncStrat_BT/aou_AD_any_anc_${anc}_gwas_hyphenid_pval_chrpos.txt ;\
+done
+
+# Get data for multiancestry too
+awk 'NR==1 {$18 = "IDrev"; print} NR>1 {$18 = $1 "-" $2 "-" $5 "-" $4; print}' \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/AncStrat_BT/aou_AD_any_anc_all_gwas_hyphenid_pval_chrpos.txt
+
+# Intersect, checking for standard or reversed ID. First intersect is forwards
+mkdir single_anc_final_hits_intersect ;\
+for anc in "${ancestries[@]}"; do \
+  echo $anc ;\
+  if [ "$anc" == "all" ]; then
+    awk 'NR==FNR{arr[$1];next} ($3 in arr) || ($17 in arr)' \
+      /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/anc_hwe_midp.txt \
+      /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/AncStrat_BT/aou_AD_any_anc_${anc}_gwas_hyphenid_pval_chrpos.txt > \
+      single_anc_final_hits_intersect/final_hits_intersect_aou_${anc}.txt ;\
+  else \
+    awk 'NR==FNR{arr[$1];next} ($3 in arr) || ($18 in arr)' \
+      /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/anc_hwe_midp.txt \
+      /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/AncStrat_BT/aou_AD_any_anc_${anc}_gwas_hyphenid_pval_chrpos.txt > \
+      single_anc_final_hits_intersect/final_hits_intersect_aou_${anc}.txt ;\
+  fi ;\
+done
+
+# Then stick the p values into the table in R
+{R}
+make_supplemental_table_hwe_aou_p = function() {
+  midp_df = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/anc_hwe_midp.txt",show_col_types=F) %>%
+    mutate(ALL_GW_P=NA,EUR_GW_P = NA,AFR_GW_P = NA,AMR_GW_P = NA)
+  intersect_dfs = lapply(X=c("all","eur","afr","amr"),FUN = function(x) {
+    vroom(glue("single_anc_final_hits_intersect/final_hits_intersect_aou_{x}.txt"),show_col_types = F)
+  })
+  for (r in 1:nrow(midp_df)) {
+    if (r %% 100 == 0) print(glue("On row {r} of {nrow(midp_df)}"))
+    curr_r = midp_df[r,]
+    for (a in 1:4) {
+      match = intersect_dfs[[a]] %>% filter(ID == curr_r$ID | IDrev == curr_r$ID)
+      if (nrow(match) > 1) match %<>% filter(ID == curr_r$ID)
+      if (nrow(match)>0) midp_df[[r,(8+a)]] = match$Pval
+    }
+  }
+  write_xlsx(list("SupplementalTable" = midp_df), # remove empty rows
+             path = "Paper_Tables_Figures/SupplementalTable_AoU_HWE_P_By_Ancestry.xlsx")
+  print("Wrote table to: Paper_Tables_Figures/SupplementalTable_AoU_HWE_P_By_Ancestry.xlsx")
+  
+  return(midp_df)
+}
+{/R}
