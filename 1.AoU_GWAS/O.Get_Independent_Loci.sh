@@ -15,3 +15,7 @@ separate_loci = function(df) {
 
 ######################################
 # Then bring this data into AoU (in a zip file)
+unzip locus_hits.zip
+for file in locus_hits/*.txt ; do \
+
+done
