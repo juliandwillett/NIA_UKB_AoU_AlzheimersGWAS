@@ -31,7 +31,7 @@ for file in locus_hits/beds/*.bed ; do \
   fname="${fname%.*}" ;\
   chr="${fname%%_*}" ;\
   ./plink2 --pfile pgen_geno_1e-1_mac_20/${chr} --extract bed1 $file \
-    --r2-phased --ld-window-r2 0 --out locus_hits/ld_out/$fname ;\
+    --r2-phased --ld-window-r2 0 --ld-window 1000 --ld-window-kb 5000 --out locus_hits/ld_out/$fname ;\
     
   # For single comparisons (to look at dprime)
   #./plink2 --pfile pgen_geno_1e-1_mac_20/chr1 --extract bed1 locus_hits/beds/chr1_1_numvar_16.txt.bed \
