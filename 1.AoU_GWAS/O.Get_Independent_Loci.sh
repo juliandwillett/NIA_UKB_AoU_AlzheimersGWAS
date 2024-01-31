@@ -30,15 +30,17 @@ for file in locus_hits/beds/*.bed ; do \
   fname="${fname%.*}" ;\
   fname="${fname%.*}" ;\
   chr="${fname%%_*}" ;\
-  #./plink2 --pfile pgen_geno_1e-1_mac_20/${chr} --extract bed1 $file \
-  #  --make-bed --out locus_hits/plink1_files/$fname ;\
-  ./plink --bfile locus_hits/plink1_files/$fname --r2 --out locus_hits/ld_out/$fname
-  
-    --ld "9-105169701-G-A" "9-105169723-T-C" hwe-midp --out locus_hits/ld_out/$fname ;\
+  ./plink2 --pfile pgen_geno_1e-1_mac_20/${chr} --extract bed1 $file \
+    --r2-phased --ld-window-r2 0 --out locus_hits/ld_out/$fname ;\
+    
+  # For single comparisons (to look at dprime)
+  #./plink2 --pfile pgen_geno_1e-1_mac_20/chr1 --extract bed1 locus_hits/beds/chr1_1_numvar_16.txt.bed \
+  #  --ld "1-9830445-T-C" "1-8774498-CAT-C" hwe-midp #--out locus_hits/ld_out/$fname ;\
+
 done
 
 # merge output to make comparison easier
-head -1 locus_hits/ld_out/$fname.ld > locus_hits/ld_out/ld_comparisons.txt ;\
-for file in locus_hits/ld_out/*.ld ; do \
+head -1 locus_hits/ld_out/$fname.vcor > locus_hits/ld_out/ld_comparisons.txt ;\
+for file in locus_hits/ld_out/*.vcor ; do \
   tail -n +2 "$file" >> locus_hits/ld_out/ld_comparisons.txt ;\
 done
