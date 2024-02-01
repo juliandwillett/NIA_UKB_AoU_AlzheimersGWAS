@@ -27,34 +27,47 @@ for file in *.txt ; do \
 done
 cd ..
 
+# First do clumping to help reduce the number of hits
 for file in locus_hits/beds/*.bed ; do \
   fname="${file##*/}" ;\
   fname="${fname%.*}" ;\
   fname="${fname%.*}" ;\
   chr="${fname%%_*}" ;\
+
+  # First do clumping
   ./plink2 --pfile pgen_geno_1e-1_mac_20/${chr} --extract bed1 $file \
     --clump locus_hits/assoc_files/${fname}.txt.plink --clump-r2 0.01 --clump-id-field "ID" \
     --clump-p-field "MetaP" --out locus_hits/clumped/$fname
-  
-  #./plink2 --pfile pgen_geno_1e-1_mac_20/${chr} --extract bed1 $file \
-  #  --r2-phased --ld-window-r2 0 --ld-window 1000 --ld-window-kb 5000 --out locus_hits/ld_out/$fname ;\
-    
-  # For single comparisons (to look at dprime)
-  #./plink2 --pfile pgen_geno_1e-1_mac_20/chr1 --extract bed1 locus_hits/beds/chr1_1_numvar_16.txt.bed \
-  #  --ld "1-9830445-T-C" "1-8774498-CAT-C" hwe-midp #--out locus_hits/ld_out/$fname ;\
-
 done
-
 # merge output to make comparison easier
 head -1 locus_hits/clumped/$fname.clumps > locus_hits/clumped/clumps.txt ;\
 for file in locus_hits/clumped/*.clumps ; do \
   tail -n +2 "$file" >> locus_hits/clumped/clumps.txt ;\
 done
 
-#########################
-# To run it on single files (for checking out missing hits)
-vroom_write(final_hits_updated_clumped_loci[["Failed Clumps"]] %>% filter(Locus==120) %>% select(ID,MetaP,CHROM,POS,Allele0,Allele1),"zz_loc120.txt")
-awk '{print $3 "\t" $4 "\t" $4}' zz_loc120.txt > zz_loc120.bed ;\
-./plink2 --pfile pgen_geno_1e-1_mac_20/chr2 --extract bed1 zz_loc120.bed \
-    --clump zz_loc120.txt --clump-r2 0.01 --clump-id-field "ID" \
-    --clump-p-field "MetaP" --out zz_loc120_clump
+################
+# Then do conditional analysis, either with regenie or GCTA-COJO. Regenie would probably be better.
+# For regenie conditional analysis.
+for file in locus_hits/beds/*.bed ; do \
+  fname="${file##*/}" ;\
+  fname="${fname%.*}" ;\
+  fname="${fname%.*}" ;\
+  chr="${fname%%_*}" ;\
+
+  ./plink2 --pfile pgen_geno_1e-1_mac_20/${chr} --extract bed1 $file \
+    --make-pgen --out locus_hits/pgen/$fname
+  awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' locus_hits/pgen/$fname.psam > t ;\
+  mv t locus_hits/pgen/$fname.psam
+
+  awk -F'\t' 'NR==1 || $14 < min {min=$14; line=$0} END {print line}' locus_hits/$fname.txt | \
+    awk '{print $2}' > locus_hits/cond_data/$fname.cond
+
+  #awk 'NR==FNR{arr[$2]; next} $3 in arr' locus_hits/$fname.txt locus_hits/pgen/$fname.pvar | \
+   # awk 'NR>1 {print $3}' > locus_hits/cond_data/$fname.cond
+  
+  ./regenie_v3.2.8.gz_x86_64_Linux --step 2 \
+    --pgen locus_hits/pgen/$fname --phenoFile regenie_pheno.txt \
+    --covarFile regenie_covar_20pcs.txt --bt --firth-se --firth --approx \
+    --pThresh 0.01 --pred revised_pred.list --bsize 400 --out locus_hits/cond_data_rg_out/$fname \
+    --minMAC 20 --condition-list locus_hits/cond_data/$fname.cond --phenoCol AD_any ;
+done
