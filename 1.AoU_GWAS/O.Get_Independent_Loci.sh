@@ -50,3 +50,11 @@ head -1 locus_hits/clumped/$fname.clumps > locus_hits/clumped/clumps.txt ;\
 for file in locus_hits/clumped/*.clumps ; do \
   tail -n +2 "$file" >> locus_hits/clumped/clumps.txt ;\
 done
+
+#########################
+# To run it on single files (for checking out missing hits)
+vroom_write(final_hits_updated_clumped_loci[["Failed Clumps"]] %>% filter(Locus==120) %>% select(ID,MetaP,CHROM,POS,Allele0,Allele1),"zz_loc120.txt")
+awk '{print $3 "\t" $4 "\t" $4}' zz_loc120.txt > zz_loc120.bed ;\
+./plink2 --pfile pgen_geno_1e-1_mac_20/chr2 --extract bed1 zz_loc120.bed \
+    --clump zz_loc120.txt --clump-r2 0.01 --clump-id-field "ID" \
+    --clump-p-field "MetaP" --out zz_loc120_clump
