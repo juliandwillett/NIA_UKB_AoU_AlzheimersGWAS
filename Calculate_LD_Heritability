@@ -4,7 +4,7 @@ gwas_common_aou = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS
 gwas_common_ukb = vroom("/n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_hyphen_ids_pvals_chrpos_maf_1e-3.regenie")
 bed_file = gwas_common %>% select(CHROM,GENPOS) %>% mutate(ENDPOS=GENPOS) %>%
   mutate(CHROM = paste0("chr",CHROM))
-vroom_write(bed_file,"aou_ad_any_anc_all_commonvar_forstepdown_ucsc.bed") # pipe this through
+vroom_write(bed_file,"aou_ad_any_anc_all_commonvar_forstepdown_ucsc.bed",col_names=F) # pipe this through
 
 # now read in this data
 bed_grch37 = vroom("/n/home09/jwillett/true_lab_storage/00_AoU/aou_ad_any_anc_all_commonvar_ucsc_grch37.bed",col_names=F) # edit for path of aou vs ukb data
