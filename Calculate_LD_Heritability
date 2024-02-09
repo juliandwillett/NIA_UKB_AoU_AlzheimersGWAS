@@ -42,7 +42,7 @@ python munge_sumstats.py \
 --out /n/home09/jwillett/true_lab_storage/00_AoU/munged_ad_any 
 
 python munge_sumstats.py \
---sumstats /n/home09/jwillett/true_lab_storage/00_AoU/ukb_commonvar.ma \
+--sumstats /n/home09/jwillett/true_lab_storage/00_AoU/ukb_ad_any_anc_all_commonvar.ma \
 --snp ID --N-col N --a1 ALLELE1 --a2 ALLELE0 --p P --frq A1FREQ --a1-inc \
 --out /n/home09/jwillett/true_lab_storage/00_AoU/munged_ukb_proxy.sumstats.gz
 
@@ -54,7 +54,7 @@ python ldsc.py \
 --out /n/home09/jwillett/true_lab_storage/00_AoU/ad_any_herit_aou
 
 python ldsc.py \
---h2 /n/home09/jwillett/true_lab_storage/00_AoU/munged_ukb_proxy.sumstats.gz \
+--h2 /n/home09/jwillett/true_lab_storage/00_AoU/munged_ukb_proxy.sumstats.gz.sumstats.gz \
 --ref-ld-chr /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr_chrpos_ids/ \
 --w-ld-chr /n/home09/jwillett/true_lab_storage/Data_Links/LD_Ref_GRCh37/eur_w_ld_chr_chrpos_ids/ \
 --out /n/home09/jwillett/true_lab_storage/00_AoU/ad_any_herit_ukb
