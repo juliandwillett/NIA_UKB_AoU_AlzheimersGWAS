@@ -75,7 +75,8 @@ ancestries=(eur afr amr)
 for ((chr=1;chr<=22;chr++)); do \
         curr_chr="chr${chr}" ;\
         for anc in "${ancestries[@]}"; do \
-                awk '{gsub("duplicateofalzheimersgwastake5d1", "duplicateofalzheimersgwastake5", $2)} 1' aou_step1_rg_array_anc_${anc}_pred.list > revised_pred.list
+                # orig string in first line, replacement in second
+                awk '{gsub("duplicateofalzheimersgwastake5d1", "duplicateofduplicateofalzheimersgwastake6", $2)} 1' aou_step1_rg_array_anc_${anc}_pred.list > revised_pred.list
                 ./regenie_v3.2.8.gz_x86_64_Linux \
                     --step 2 \
                     --pgen plink_${curr_chr}_allvar_anc_all \
