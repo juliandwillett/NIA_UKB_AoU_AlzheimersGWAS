@@ -3,12 +3,12 @@ awk -v OFS='\t' 'NR==1 {print $0 "\tPval"} NR>1 {$15 = 10^(-1 * $12); print }' /
 awk -v OFS='\t' 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' aou_AD_any_anc_all_gwas_pvals.txt > aou_AD_any_anc_all_gwas_pvals_ids.txt # split multiallelics have "." as ID, so fix this
 
 # Add p val, IDs column to UKB
-awk -v OFS='\t' 'NR==1 { $14 = "Pval"; print} NR>1 {$3 = $1 ":" $2 ":" $4 "," $5; $14 = 10^(-1 * $12); print }' \
-/n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_ensure20.txt > \
-/n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/proxy_files_Step1_2_corrected_tab_withids_pval_ensure20.txt
+awk -v OFS='\t' 'NR==1 { $14 = "Pval"; print} NR>1 && $13 != "TEST_FAIL" {$3 = $1 ":" $2 ":" $4 "," $5; $14 = 10^(-1 * $12); print }' \
+/n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete.regenie > \
+/n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id.regenie
 
 # Run a script with the METAL parameters
-salloc -p test --mem 80000 -t 0-04:00 -n 6
+salloc -p test --mem 160000 -t 0-04:00 -n 6
 metal METAL_script_AOU_UKB.txt
 
 # functions to clean up data for further processing and expedite analysis (intersections with single GWAS, for example)
@@ -36,10 +36,10 @@ awk 'NR==FNR{arr[$18]; next} $16 in arr' meta_hits_for_intersects_aou_vs_ukb.txt
 
 # Do the same for UKB
 awk 'NR==1 {$15 = "CHRPOS"; print} NR>1 {$15 = $1 "-" $2; print}' \
-  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_hyphen_ids_pvals.regenie > \
-  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_hyphen_ids_pvals_chrpos.regenie
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id.regenie > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie
 awk 'NR==FNR{arr[$18]; next} $15 in arr' meta_hits_for_intersects_aou_vs_ukb.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_hyphen_ids_pvals_chrpos.regenie > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie > \
   meta_hits_ukb_intersect_aou_vs_ukb.txt
 
 # Intersect with NIAGADS to check for mutual hits
