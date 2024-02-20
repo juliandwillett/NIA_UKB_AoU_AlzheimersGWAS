@@ -3,7 +3,7 @@ awk -v OFS='\t' 'NR==1 {print $0 "\tPval"} NR>1 {$15 = 10^(-1 * $12); print }' /
 awk -v OFS='\t' 'NR>1 {$3 = $1 ":" $2 ":" $4 "," $5}1' aou_AD_any_anc_all_gwas_pvals.txt > aou_AD_any_anc_all_gwas_pvals_ids.txt # split multiallelics have "." as ID, so fix this
 
 # Add p val, IDs column to UKB
-awk -v OFS='\t' 'NR==1 { $14 = "Pval"; print} NR>1 && $13 != "TEST_FAIL" {$3 = $1 ":" $2 ":" $4 "," $5; $14 = 10^(-1 * $12); print }' \
+awk -v OFS='\t' 'NR==1 { $14 = "Pval"; print} NR>1 && $13 != "TEST_FAIL" {$3 = $1 "-" $2 "-" $4 "-" $5; $14 = 10^(-1 * $12); print }' \
 /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete.regenie > \
 /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id.regenie
 
