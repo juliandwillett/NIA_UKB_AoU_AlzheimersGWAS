@@ -10,4 +10,4 @@ for (file in list.files(path = "locuses",full.names = F)) {
 # produce files for common loci, noting the lead variant
 chr=19 ;\
 file="rs10401157.txt" ;\
-./plink2 --r2-phased --pgen pgen_geno_1e-1_mac_20/chr${chr} --ld-window-r2 0.0 --ld-snp-list locuses_snplist/{file}.snp
+./plink2 --r2-phased --pfile pgen_geno_1e-1_mac_20/chr${chr} --ld-window-r2 0.2 --ld-snp-list locuses_snplist/${file}.snp
