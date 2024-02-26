@@ -18,4 +18,8 @@ for f in locuses_snplist/* ; do \
     chr=$(head -1 $f | cut -d '-' -f1) ;\
     ./plink2 --r2-phased --pfile pgen_geno_1e-1_mac_20/chr${chr} --ld-window-r2 0.0 --ld-snp-list $f \
         --out locuses_ld/$fname.ld --memory 100000 ;\
+    ./plink2 --pfile pgen_geno_1e-1_mac_20/chr19 --ld "19-44921257-A-C" "19-44921093-TAA-T" 'hwe-midp'
 done
+
+# Now isolate the data for only the lead SNP, then export this data.
+{R}
