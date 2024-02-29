@@ -8,13 +8,17 @@ done
 
 #####
 # In R, replace covar file PCs with ancestry-specific ones, then write to named file.
-covar_template = vroom("regenie_covar.txt")
+library(vroom); library(glue); library(tidyverse)
+
+covar_template = vroom("regenie_covar.txt",show_col_types = F)
 
 for (anc in c('eur','afr','amr')) {
-  anc_pcs = vroom(glue("ancestries/array_pcs_{anc}.eigenvec"))
-  covar_out = covar_template
+  print(anc)
+    anc_pcs = vroom(glue("ancestries/array_pcs_{anc}.eigenvec"),show_col_types=F)
+    print(names(anc_pcs))
+  covar_out = covar_template %>% filter(IID %in% anc_pcs$IID)
   for (pc in 1:20) {
-    covar_col = which(names(covar_col) == paste0("PC",pc))
+    covar_col = which(names(covar_out) == paste0("PC",pc,"_C"))
     pc_table_col = which(names(anc_pcs) == paste0("PC",pc))
     covar_out[[covar_col]] = anc_pcs[[pc_table_col]]
   }
