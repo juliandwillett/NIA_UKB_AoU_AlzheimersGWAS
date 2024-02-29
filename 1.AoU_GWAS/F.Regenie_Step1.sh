@@ -36,5 +36,23 @@ awk 'NR==1 {print "#FID\tIID"} NR>1 {print "0\t" $1}' relatedness_flagged_sample
     --phenoCol AD_any \
     --remove related_flagged_for_regenie.txt
 
+# Rerun regenie step 1 by ancestry, using appropriate covar file (PCs for single ancestry)
+ancestries=(eur amr afr) ;\
+for anc in "${ancestries[@]}"; do \
+    ./regenie_v3.2.8.gz_x86_64_Linux \
+    --step 1 \
+    --pgen piezo2_work/array_data/arrays_autosomes_post_qc_pruned_common \
+    --phenoFile regenie_pheno.txt \
+    --covarFile regenie_covar_${anc}.txt \
+    --bt \
+    --out rg_step1_singleanc/aou_step1_rg_common_${anc} \
+    --bsize 1000 \
+    --lowmem \
+    --lowmem-prefix tmp_rg_40 \
+    --phenoCol AD,AD_any
+done
+gsutil -m cp -rn rg_step1_singleanc/aou_step1_rg_common* $WORKSPACE_BUCKET/data/regenie_step1_singleanc_anc_pcs/
+
 # Backup results
 gsutil -m cp -rn aou_step1_rg_array_norelated_* $WORKSPACE_BUCKET/data/regenie_step1_norelated/
+
