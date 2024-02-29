@@ -49,7 +49,7 @@ for anc in "${ancestries[@]}"; do \
     --bsize 1000 \
     --lowmem \
     --lowmem-prefix tmp_rg_40 \
-    --phenoCol AD,AD_any
+    --phenoCol AD,AD_any ;\
 done
 gsutil -m cp -rn rg_step1_singleanc/aou_step1_rg_common* $WORKSPACE_BUCKET/data/regenie_step1_singleanc_anc_pcs/
 
