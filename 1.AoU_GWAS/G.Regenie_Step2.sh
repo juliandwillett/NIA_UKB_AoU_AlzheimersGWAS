@@ -71,27 +71,28 @@ gsutil -m cp -rn ancestries/*ids.txt $bucket/data/ancestry_ids/
 
 # get backed up data and run
 gsutil cp $WORKSPACE_BUCKET/data/*_ids.txt .
-ancestries=(eur afr amr)
+ancestries=(amr afr eur)
 for ((chr=1;chr<=22;chr++)); do \
         curr_chr="chr${chr}" ;\
         for anc in "${ancestries[@]}"; do \
                 # orig string in first line, replacement in second
-                awk '{gsub("duplicateofalzheimersgwastake5d1", "duplicateofduplicateofalzheimersgwastake6", $2)} 1' aou_step1_rg_array_anc_${anc}_pred.list > revised_pred.list
+                #awk '{gsub("duplicateofalzheimersgwastake5d1", "duplicateofduplicateofalzheimersgwastake6", $2)} 1' aou_step1_rg_array_anc_${anc}_pred.list > revised_pred.list
                 ./regenie_v3.2.8.gz_x86_64_Linux \
                     --step 2 \
-                    --pgen plink_${curr_chr}_allvar_anc_all \
+                    --pgen pgen_geno_1e-1_mac_20/chr${chr} \
                     --phenoFile regenie_pheno.txt \
-                    --covarFile regenie_covar.txt \
+                    --covarFile regenie_covar_${anc}.txt \
                     --bt --firth-se \
                     --firth --approx --pThresh 0.01 \
-                    --pred revised_pred.list \
+                    --pred rg_step1_singleanc/aou_step1_rg_common_${anc}_pred.list \
                     --bsize 400 \
-                    --out aou_step2_rg_${curr_chr}_firthallvariants_${anc} \
+                    --out rg_step2_singleanc_anc_specific_pcs/aou_step2_rg_${curr_chr}_firth_${anc}_ancspecific_pcs \
                     --minMAC 20 \
                     --phenoCol AD_any --keep ancestries/${anc}_ids.txt ;\
-                gsutil -m cp -r aou_step2_rg_${curr_chr}_firthallvariants_${anc}* $WORKSPACE_BUCKET/data/rg_results_rel_anc_strat/ ;\
         done  
 done
+gsutil -m cp -r rg_step2_singleanc_anc_specific_pcs/* $WORKSPACE_BUCKET/data/rg_results_anc_strat_ancspecific_pcs/ ;\
+
 
 #####
 # Code for parallelizing
