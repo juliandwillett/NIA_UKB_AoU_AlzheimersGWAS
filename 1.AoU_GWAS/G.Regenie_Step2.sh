@@ -1,5 +1,8 @@
 # For plink work,  I recommend 32 CPUs with 120 GB RAM.
-# For regenie work, I recommend 64 CPUs with 204 GB of RAM.
+# For regenie work, I recommend 64 CPUs with 204 GB of RAM. 
+#  32 cores with matching ram is 50% less cost with 50% less speed, so 64 makes more sense.
+#  96 cores with 86 ram is about the same speed as 64 with 204.
+# 400 GB of RAM did not make any difference vs 200 GB
 
 # Get necessary files
 wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\
@@ -72,7 +75,7 @@ gsutil -m cp -rn ancestries/*ids.txt $bucket/data/ancestry_ids/
 # get backed up data and run
 gsutil cp $WORKSPACE_BUCKET/data/*_ids.txt .
 ancestries=(amr afr eur)
-for ((chr=1;chr<=22;chr++)); do \
+for ((chr=2;chr<=22;chr++)); do \
         curr_chr="chr${chr}" ;\
         for anc in "${ancestries[@]}"; do \
                 # orig string in first line, replacement in second
@@ -88,7 +91,7 @@ for ((chr=1;chr<=22;chr++)); do \
                     --bsize 400 \
                     --out rg_step2_singleanc_anc_specific_pcs/aou_step2_rg_${curr_chr}_firth_${anc}_ancspecific_pcs \
                     --minMAC 20 \
-                    --phenoCol AD_any --keep ancestries/${anc}_ids.txt ;\
+                    --phenoCol AD,AD_any --keep ancestries/${anc}_ids.txt ;\
         done  
 done
 gsutil -m cp -r rg_step2_singleanc_anc_specific_pcs/* $WORKSPACE_BUCKET/data/rg_results_anc_strat_ancspecific_pcs/ ;\
