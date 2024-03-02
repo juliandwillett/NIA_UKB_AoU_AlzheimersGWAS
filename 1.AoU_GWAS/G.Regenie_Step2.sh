@@ -1,5 +1,5 @@
 # For plink work,  I recommend 32 CPUs with 120 GB RAM.
-# For regenie work, I recommend 96 CPUs with 86 GB of RAM.
+# For regenie work, I recommend 64 CPUs with 204 GB of RAM.
 
 # Get necessary files
 wget https://s3.amazonaws.com/plink2-assets/alpha3/plink2_linux_avx2_20221024.zip ;\
