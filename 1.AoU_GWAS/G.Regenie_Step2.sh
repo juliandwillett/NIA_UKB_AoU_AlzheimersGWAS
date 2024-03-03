@@ -1,4 +1,5 @@
 # For plink work,  I recommend 32 CPUs with 120 GB RAM.
+# For regenie step 1, 16 cores 104 GB.
 # For regenie work, I recommend 64 CPUs with 204 GB of RAM. 
 #  32 cores with matching ram is 50% less cost with 50% less speed, so 64 makes more sense.
 #  96 cores with 86 ram is about the same speed as 64 with 204.
