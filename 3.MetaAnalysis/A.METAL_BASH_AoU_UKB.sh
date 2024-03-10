@@ -8,7 +8,7 @@ awk -v OFS='\t' 'NR==1 { $14 = "Pval"; print} NR>1 && $13 != "TEST_FAIL" {$3 = $
 /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id.regenie
 
 # Run a script with the METAL parameters
-salloc -p test --mem 160000 -t 0-04:00 -n 6
+salloc -p test --mem 160000 -t 0-04:00 -c 6
 metal METAL_script_AOU_UKB.txt
 
 # functions to clean up data for further processing and expedite analysis (intersections with single GWAS, for example)
