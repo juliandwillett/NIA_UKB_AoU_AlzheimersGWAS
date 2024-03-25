@@ -17,6 +17,11 @@ for file in plink_${curr_chr}_multi_split.pgen/* ; do \
     rm plink_${curr_chr}_multi_split.bgen/${prefix2}* ;\ 
 done ;\
 
+# For X chromosome:
+./plink2 --bgen plink_chrX_multi_split.bgen 'ref-first' --sample plink_chrX_multi_split.sample \
+    --make-pgen --out plink_chrX_multi_split --set-all-var-ids @:#:\$r,\$a \
+    --new-id-max-allele-len 10000 --split-par 'hg38'
+
 # get all the pgen prefixes so they can be merged
 find plink_${curr_chr}_corrected_ids -type f -name "*.pgen" > pgen_files.txt ;\
 sed -e 's/\.pgen//g' pgen_files.txt > pgen_files_prefix.txt ;\
