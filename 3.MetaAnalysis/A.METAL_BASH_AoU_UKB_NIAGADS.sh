@@ -5,8 +5,7 @@ awk 'NR==1 {$3 = "ID"; $5 = "ALLELE1"; $6 = "ALLELE0"; $7 = "A1FREQ"; $8 = "BETA
   /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/nia_all_affectionstatus_for_meta.txt
 
 # Run a script with the METAL parameters
-salloc -p test --mem 80000 -t 0-02:00 -n 4
-metal METAL_script_AOU_NIAGADS.txt
+sbatch 1A_RunMETAL.sh
 
 # functions to clean up data for further processing and expedite analysis (intersections with single GWAS, for example)
 mv METAANALYSIS1.TBL aou_niagads_allvar_meta_analysis.TBL
