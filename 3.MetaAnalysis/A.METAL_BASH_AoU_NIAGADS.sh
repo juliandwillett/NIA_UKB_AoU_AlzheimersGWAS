@@ -1,6 +1,6 @@
 # FORMAT NIAGADS SO COMPATIBLE WITH OTHER DATASETS
 awk 'NR==1 {$3 == "ID"; $5 = "ALLELE1"; $6 = "ALLELE0"; $7 = "A1FREQ"; $8 = "BETA"; $9 = "SE"; \
-  $10 = "Pval"; print $0} NR>1 {$3 = $1 + "-" $2 + "-" $6 + "-" $5; print $0}' \
+  $10 = "Pval"; print $0} NR>1 {$3 = $1 "-" $2 "-" $6 "-" $5; print $0}' \
   /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS/selfALL26243_a_pc_5JPCs_noage_ss.Affection.Status.glm.logistic.full.dn8 >\
   /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/nia_all_affectionstatus_for_meta.txt
 
