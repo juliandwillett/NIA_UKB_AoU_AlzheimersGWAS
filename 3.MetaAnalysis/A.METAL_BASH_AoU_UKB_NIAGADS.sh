@@ -8,32 +8,49 @@ awk 'NR==1 {$3 = "ID"; $5 = "ALLELE1"; $6 = "ALLELE0"; $7 = "A1FREQ"; $8 = "BETA
 sbatch 1A_RunMETAL.sh
 
 # functions to clean up data for further processing and expedite analysis (intersections with single GWAS, for example)
-mv METAANALYSIS1.TBL aou_niagads_allvar_meta_analysis.TBL
+mv METAANALYSIS1.TBL aou_ukb_nia_allvar_meta_analysis.TBL
 
 # Add CHR, POS, and FAVOR_ID columns, to make sorting easier and enable later intersections (ie intersection with Bellenguez et al for comparison)
-awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0 "\tCHR\tPOS\tID\tIDrev"} NR>1 {split($1, values, ":"); $16 = values[1]; $17 = values[2]; $18 = $16 "-" $17 "-" toupper($2) "-" toupper($3); $19 = $16 "-" $17 "-" toupper($3) "-" toupper($2); $20 = $16 "-" $17; print $0}' \
-  aou_niagads_allvar_meta_analysis.TBL > aou_niagads_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL
+awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0 "\tCHR\tPOS\tIDrev"} NR>1 {split($1, values, "-"); $16 = values[1]; \
+  $17 = values[2]; $18 = $16 "-" $17 "-" toupper($3) "-" toupper($2); $20 = $16 "-" $17; print $0}' \
+  aou_ukb_nia_allvar_meta_analysis.TBL > aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols.TBL
 
 # Isolate GW significant hits to focus the analysis (and make R code work more efficiently)
-awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0} NR>1 && $10 <= 5e-8 {print $0}' aou_niagads_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL > \
-  aou_niagads_allvar_meta_analysis_IDcolon_chrposrefalt_cols_gw_sig.TBL
+awk 'BEGIN{FS=" "; OFS="\t"} NR==1 {print $0} NR>1 && $10 <= 5e-8 && $16 != 23 {print $0}' \
+  aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols.TBL > \
+  aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols_gw_sig.TBL
 
-# to make intersect reference file: in R
-data = vroom("aou_niagads_allvar_meta_qc_sorted_gwsig.txt") # make in R using first block of code
-data %<>% mutate(CHRPOS = glue("{CHR}-{POS}"))
-vroom_write(data,"meta_hits_for_intersects_vsniagads.txt")
+#############
+# R processing and make intersect reference file: in R
+data = vroom("aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols_gw_sig.TBL") %>%
+  select(-HetISq,-HetChiSq) %>% filter((MaxFreq - MinFreq) < 0.4,CHR < 23) %>% arrange(CHR,POS)
+vroom_write(data,"aou_ukb_nia_allvar_meta_qc_sorted_gwsig.txt") 
+vroom_write(data %>% select(MarkerName),"working/favor_hits_aou_vs_ukb.txt",col_names=F) # for favor 
+vroom_write(data %>% mutate(CHRPOS = glue("{CHR}-{POS}")),"working/meta_hits_for_intersects.txt")
 
-# Intersect the meta significant hits with each GWAS to make getting p values more efficient
-awk 'NR==FNR{arr[$19]; next} $16 in arr' meta_hits_for_intersects_vsniagads.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/NON_MCC_GWAS/aou_AD_any_anc_all_gwas_pvals_ids_chrompos_firthse_ensure20.txt > \
-  meta_hits_aou_intersect_vs_niagads.txt
-awk 'NR==1 {$15 = "CHRPOS"; print} NR>1 {$15 = $1 "-" $2; print}' /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_ensure20.txt > \
-  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos_ensure20.txt
-awk 'NR==FNR{arr[$19]; next} $15 in arr' meta_hits_for_intersects_vsniagads.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos_ensure20.txt > \
-  meta_hits_niagads_intersect_vs_niagads.txt
+#############
+# Intersect the meta significant hits with each GWAS to make getting p values more efficient. Start with AoU here
+awk 'NR==1 {$16 = "CHRPOS"; print} NR>1 {$16 = $1 "-" $2; print}' \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals.txt > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt
+awk 'NR==FNR{arr[$18]; next} $16 in arr' working/meta_hits_for_intersects.txt \
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt > \
+  working/meta_hits_aou_intersect.txt
+
+# Do the same for UKB
+awk 'NR==1 {$15 = "CHRPOS"; print} NR>1 {$15 = $1 "-" $2; print}' \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id.regenie > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie
+awk 'NR==FNR{arr[$18]; next} $15 in arr' working/meta_hits_for_intersects.txt \
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie > \
+  working/meta_hits_ukb_intersect.txt
+
+# Intersect with NIAGADS to check for mutual hits
+awk 'NR==FNR{arr[$18]; next} $15 in arr' working/meta_hits_ukb_intersect.txt \
+  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos.txt > \
+  meta_hits_niagads_intersect_aou_vs_ukb.txt
 
 # Then make files for Manhattan to ensure efficiency
-awk 'NR==1 {print $0} NR>1 && $16 < 23 && $7 - $6 < 0.4 && $10 < 1e-3 {print $0}' \
-/n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/aou_ukb_allvar_meta_analysis_IDcolon_chrposrefalt_cols.TBL > \
-/n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/meta_qc_for_manhattan.txt
+awk 'NR==1 {print $0} NR>1 && $16 < 23 && $7 - $6 < 0.4 && $10 < 1e-1 {print $0}' \
+  /n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols.TBL > \
+  /n/holystore01/LABS/tanzi_lab/Users/jwillett/00_AoU/working/meta_qc_for_manhattan.txt
