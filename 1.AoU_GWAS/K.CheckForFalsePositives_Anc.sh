@@ -77,6 +77,12 @@ print(nrow(anc_hwe %>% filter(MIDP_EUR <= 1e-15 | MIDP_AFR <= 1e-15 | MIDP_AMR <
 ####################################
 ##############
 # BACK TO FASRC
+
+
+
+
+
+
 # To then give this file columns with single-ancestry regenie p-values, use the following:
 ancestries=(all eur afr amr) ;\
 for anc in "${ancestries[@]}"; do \
