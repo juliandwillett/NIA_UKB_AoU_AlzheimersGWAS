@@ -19,7 +19,7 @@ separate_loci = function(df) {
 unzip locus_hits.zip
 mkdir locus_hits/beds/
 mkdir locus_hits/assoc_files/
-mkdir locus_hits/plink1_files/
+mkdir locus_hits/clumped/
 cd locus_hits
 for file in *.txt ; do \
   awk '{print $5 "\t" $6 "\t" $6}' $file > beds/$file.bed ;\
@@ -35,10 +35,11 @@ for file in locus_hits/beds/*.bed ; do \
   chr="${fname%%_*}" ;\
 
   # First do clumping
-  ./plink2 --pfile pgen_geno_1e-1_mac_20/${chr} --extract bed1 $file \
+  ./plink2 --pfile pgen_qc/${chr}_geno_mac --extract bed1 $file \
     --clump locus_hits/assoc_files/${fname}.txt.plink --clump-r2 0.01 --clump-id-field "ID" \
-    --clump-p-field "MetaP" --out locus_hits/clumped/$fname
+    --clump-p-field "MetaP" --out locus_hits/clumped/$fname ;\
 done
+
 # merge output to make comparison easier
 head -1 locus_hits/clumped/$fname.clumps > locus_hits/clumped/clumps.txt ;\
 for file in locus_hits/clumped/*.clumps ; do \
@@ -46,6 +47,12 @@ for file in locus_hits/clumped/*.clumps ; do \
 done
 
 ################
+
+
+
+
+
+
 # Then do conditional analysis, either with regenie or GCTA-COJO. Regenie would probably be better.
 # For regenie conditional analysis.
 for file in locus_hits/beds/*.bed ; do \
