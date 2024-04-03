@@ -4,13 +4,24 @@
 # So all we need are the HWE p values for single-ancestry cohorts
 
 ###########
+# FASRC: make files with p <= 1e-5 for Manhattans and QC
+awk 'NR==1 || $10 <= 1e-5 {print}' /n/home09/jwillett/true_lab_storage/00_AoU/aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols.TBL >\
+  /n/home09/jwillett/true_lab_storage/00_AoU/aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols_p_1e-5.TBL
+awk 'NR==1 || $14 <= 1e-5 {print}' /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie >\
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos_p_1e-5.regenie
+awk 'NR==1 || $15 <= 1e-5 {print}' /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt >\
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos_p_1e-5.txt
+awk 'NR==1 || $10 <= 1e-5 {print}' /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos.txt >\
+  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos_p_1e-5.txt
+
+###########
 #{R} FASRC
 make_files_for_hwe = function() {
   # get CHRPOS of key variants for HWE testing. Not using IDS here as it is slower
   # The output also includes IDs, so I can do matching there.
-  meta_hits = vroom("aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols_gw_sig.TBL",show_col_types = F) %>%
+  meta_hits = vroom("aou_ukb_nia_allvar_meta_analysis_chrposrefalt_cols_p_1e-5.TBL",show_col_types = F) %>%
     mutate(CHR = as.numeric(CHR))
-  ukb_hits = vroom("../Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos_gwsig.regenie",show_col_types = F) %>%
+  ukb_hits = vroom("../Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos_p_1e-5.regenie",show_col_types = F) %>%
     mutate(`#CHROM` = as.numeric(`#CHROM`))
   aou_hits = vroom("../Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos_gwsig.txt",show_col_types = F) %>%
     mutate(CHROM = as.numeric(CHROM))
