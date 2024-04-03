@@ -46,9 +46,9 @@ awk 'NR==FNR{arr[$18]; next} $15 in arr' working/meta_hits_for_intersects.txt \
   working/meta_hits_ukb_intersect.txt
 
 # Intersect with NIAGADS to check for mutual hits
-awk 'NR==FNR{arr[$18]; next} $15 in arr' working/meta_hits_ukb_intersect.txt \
+awk 'NR==FNR{arr[$18]; next} $15 in arr' working/meta_hits_for_intersects.txt \
   /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos.txt > \
-  meta_hits_niagads_intersect_aou_vs_ukb.txt
+  working/meta_hits_niagads_intersect.txt
 
 # Then make files for Manhattan to ensure efficiency
 awk 'NR==1 {print $0} NR>1 && $16 < 23 && $7 - $6 < 0.4 && $10 < 1e-1 {print $0}' \
