@@ -32,7 +32,7 @@ vroom_write(data %>% mutate(CHRPOS = glue("{CHR}-{POS}")),"working/meta_hits_for
 # Intersect the meta significant hits with each GWAS to make getting p values more efficient. Start with AoU here
 awk 'NR==1 {$16 = "CHRPOS"; print} NR>1 {$16 = $1 "-" $2; print}' \
   /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals.txt > \
-  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt
+  /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt ;\
 awk 'NR==FNR{arr[$18]; next} $16 in arr' working/meta_hits_for_intersects.txt \
   /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt > \
   working/meta_hits_aou_intersect.txt
@@ -40,7 +40,7 @@ awk 'NR==FNR{arr[$18]; next} $16 in arr' working/meta_hits_for_intersects.txt \
 # Do the same for UKB
 awk 'NR==1 {$15 = "CHRPOS"; print} NR>1 {$15 = $1 "-" $2; print}' \
   /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id.regenie > \
-  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie
+  /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie ;\
 awk 'NR==FNR{arr[$18]; next} $15 in arr' working/meta_hits_for_intersects.txt \
   /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie > \
   working/meta_hits_ukb_intersect.txt
