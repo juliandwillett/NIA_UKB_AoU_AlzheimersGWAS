@@ -10,6 +10,6 @@ STDERR   SE
 PVAL     Pval
 PROCESS /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals.txt
 PROCESS /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id.regenie
-PROCESS /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/nia_all_affectionstatus_for_meta.txt
+PROCESS /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/nia_all_for_meta.txt
 
 ANALYZE HETEROGENEITY
