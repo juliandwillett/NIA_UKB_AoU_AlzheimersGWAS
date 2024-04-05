@@ -17,10 +17,10 @@ separate_loci = function(df) {
 ######################################
 # Then bring this data into AoU (in a zip file)
 unzip locus_hits.zip
-mkdir locus_hits/beds/
-mkdir locus_hits/assoc_files/
-mkdir locus_hits/clumped/
-cd locus_hits
+mkdir locus_hits/beds/ ;\
+mkdir locus_hits/assoc_files/ ;\
+mkdir locus_hits/clumped/ ;\
+cd locus_hits ;\
 for file in *.txt ; do \
   awk '{print $5 "\t" $6 "\t" $6}' $file > beds/$file.bed ;\
   awk -F'\t' '{print $2 "\t" $14}' $file > assoc_files/$file.plink ;\
