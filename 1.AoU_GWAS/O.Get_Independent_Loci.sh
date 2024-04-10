@@ -16,34 +16,56 @@ separate_loci = function(df) {
 
 ######################################
 # Then bring this data into AoU (in a zip file)
-unzip locus_hits.zip
-mkdir locus_hits/beds/ ;\
-mkdir locus_hits/assoc_files/ ;\
-mkdir locus_hits/clumped/ ;\
-cd locus_hits ;\
-for file in *.txt ; do \
-  awk '{print $5 "\t" $6 "\t" $6}' $file > beds/$file.bed ;\
-  awk -F'\t' '{print $2 "\t" $14}' $file > assoc_files/$file.plink ;\
-done
-cd ..
+unzip locus_hits_all.zip
+cohorts=("AoU" "UKB" "NIA" "Meta");
 
+for coh in "${cohorts[@]}"; do \
+  mkdir locus_hits_${coh}/beds/ ;\
+  mkdir locus_hits_${coh}/assoc_files/ ;\
+  mkdir locus_hits_${coh}/clumped/ ;\
+  cd locus_hits_${coh} ;\
+  for file in *.txt ; do \
+    awk '{print $10 "\t" $11 "\t" $11}' $file > beds/$file.bed ;\
+    awk -F'\t' '{print $1 "\t" $5 "\t" $6 "\t" $7 "\t" $8}' $file > assoc_files/$file.plink ;\
+  done ;\
+  cd .. ;\
+done
+  
 # First do clumping to help reduce the number of hits
-for file in locus_hits/beds/*.bed ; do \
-  fname="${file##*/}" ;\
-  fname="${fname%.*}" ;\
-  fname="${fname%.*}" ;\
-  chr="${fname%%_*}" ;\
-
-  # First do clumping
-  ./plink2 --pfile pgen_qc/${chr}_geno_mac --extract bed1 $file \
-    --clump locus_hits/assoc_files/${fname}.txt.plink --clump-r2 0.01 --clump-id-field "ID" \
-    --clump-p-field "MetaP" --out locus_hits/clumped/$fname ;\
+for coh in "${cohorts[@]}"; do \
+  for file in locus_hits_${coh}/beds/*.bed ; do \
+    fname="${file##*/}" ;\
+    fname="${fname%.*}" ;\
+    fname="${fname%.*}" ;\
+    chr="${fname%%_*}" ;\
+  
+    # First do clumping
+    if [[ $coh == "AoU" ]]; then\
+      p_field="AoU_P" ;\
+    elif [[ $coh == "UKB" ]]; then\
+      p_field="UKB_P";\
+    elif [[ $coh == "NIA" ]]; then\
+      p_field="NIA_P";\
+    else\
+      p_field="Meta_P";\
+    fi;\
+    ./plink2 --pfile pgen_qc/${chr}_geno_mac --extract bed1 $file \
+      --clump locus_hits_${coh}/assoc_files/${fname}.txt.plink --clump-r2 0.01 --clump-id-field "ID" \
+      --clump-p-field $p_field --out locus_hits_${coh}/clumped/$fname ;\
+  done \
 done
-
+  
 # merge output to make comparison easier
-head -1 locus_hits/clumped/$fname.clumps > locus_hits/clumped/clumps.txt ;\
-for file in locus_hits/clumped/*.clumps ; do \
-  tail -n +2 "$file" >> locus_hits/clumped/clumps.txt ;\
+for coh in "${cohorts[@]}"; do \
+  for file in locus_hits_${coh}/clumped/*.clumps ; do \
+    fname="${file##*/}" ;\
+    fname="${fname%.*}" ;\
+    fname="${fname%.*}" ;\
+  done ;\
+  head -1 locus_hits_${coh}/clumped/$fname.clumps > locus_hits_${coh}/clumped/clumps.txt ;\
+  for file in locus_hits_${coh}/clumped/*.clumps ; do \
+    tail -n +2 "$file" >> locus_hits_${coh}/clumped/clumps.txt ;\
+  done;\
 done
 
 ################
