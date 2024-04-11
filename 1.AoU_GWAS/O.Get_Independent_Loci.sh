@@ -25,7 +25,7 @@ for coh in "${cohorts[@]}"; do \
   mkdir locus_hits_${coh}/clumped/ ;\
   cd locus_hits_${coh} ;\
   for file in *.txt ; do \
-    awk '{print $10 "\t" $11 "\t" $11}' $file > beds/$file.bed ;\
+    awk '{print $14 "\t" $15 "\t" $15}' $file > beds/$file.bed ;\
     awk -F'\t' '{print $1 "\t" $5 "\t" $6 "\t" $7 "\t" $8}' $file > assoc_files/$file.plink ;\
   done ;\
   cd .. ;\
@@ -66,6 +66,10 @@ for coh in "${cohorts[@]}"; do \
   for file in locus_hits_${coh}/clumped/*.clumps ; do \
     tail -n +2 "$file" >> locus_hits_${coh}/clumped/clumps.txt ;\
   done;\
+done
+
+for coh in "${cohorts[@]}"; do \
+  mv locus_hits_${coh}/clumped/clumps.txt clumps/clumps_${coh}.txt ;\
 done
 
 ################
