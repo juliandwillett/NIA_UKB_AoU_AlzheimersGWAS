@@ -11,8 +11,8 @@ awk 'NR==1 || $14 <= 1e-5 {print}' /n/home09/jwillett/true_lab_storage/Data_Link
   /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos_p_1e-5.regenie ;\
 awk 'NR==1 || $15 <= 1e-5 {print}' /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos.txt >\
   /n/home09/jwillett/true_lab_storage/Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_pvals_chrpos_p_1e-5.txt ;\
-awk 'NR==1 || $10 <= 1e-5 {print}' /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos.txt >\
-  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos_p_1e-5.txt
+awk 'NR==1 || $10 <= 1e-5 {print}' /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/nia_all_for_meta_nohwe_qc_chrpos.txt >\
+  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/nia_all_for_meta_nohwe_qc_chrpos_p_1e-5.txt
 
 ###########
 #{R} FASRC
