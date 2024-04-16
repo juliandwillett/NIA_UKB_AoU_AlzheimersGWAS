@@ -25,7 +25,7 @@ for coh in "${cohorts[@]}"; do \
   mkdir locus_hits_${coh}/clumped/ ;\
   cd locus_hits_${coh} ;\
   for file in *.txt ; do \
-    awk '{print $14 "\t" $15 "\t" $15}' $file > beds/$file.bed ;\
+    awk '{print $15 "\t" $16 "\t" $16}' $file > beds/$file.bed ;\
     awk -F'\t' '{print $1 "\t" $5 "\t" $6 "\t" $7 "\t" $8}' $file > assoc_files/$file.plink ;\
   done ;\
   cd .. ;\
