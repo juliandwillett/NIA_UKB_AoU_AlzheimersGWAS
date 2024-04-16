@@ -9,5 +9,5 @@ awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
   /n/home09/jwillett/true_lab_storage/Data_Links/UKB_GWAS_Data/all_variants_200k_complete_p_id_chrpos.regenie > \
   working/gwas_hits_ukb_intersect.txt ;\
 awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
-  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/NIAGADS_meta_chrpos.txt > \
+  /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/nia_all_for_meta_nohwe_qc_chrpos.txt > \
   working/gwas_hits_niagads_intersect.txt
