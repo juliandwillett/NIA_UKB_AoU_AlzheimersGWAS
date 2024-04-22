@@ -48,16 +48,16 @@ awk '{gsub("duplicateofalzheimersgwastake5", "duplicateofalzheimersgwastake5", $
 
 # run regenie for non ancestry stratified in parallel. While not QC'd on HWE for step 2, HWE QC was done for step 1 to get population structure 
 for ((chr=3;chr<=22;chr++)); do \
-                ./regenie_v3.2.8.gz_x86_64_Linux \
+                ./regenie_v3.4.1.gz_x86_64_Centos7_mkl \
                     --step 2 \
-                    --pgen pgen_geno_1e-1_mac_20/chr${chr} \
-                    --phenoFile regenie_pheno.txt \
-                    --covarFile regenie_covar_20pcs.txt \
-                    --bt --firth-se \
+                    --pgen pgen_qc/chr${chr}_geno_mac \
+                    --phenoFile regenie_input/regenie_pheno.txt \
+                    --covarFile regenie_input/regenie_covar_commonpcs_with_anc.txt \
+                    --bt --firth-se --catCovarList ancestry_pred \
                     --firth --approx --pThresh 0.01 \
-                    --pred revised_pred.list \
+                    --pred aou_step1_rg_array_commonpcs_anccovarcat/_pred.list \
                     --bsize 400 \
-                    --out rg_multi_geno_1e-1_mac_20/chr${chr} \
+                    --out aou_step2_rg_array_commonpcs_anccovarcat/chr${chr} \
                     --minMAC 20 \
                     --phenoCol AD_any ;\
         gsutil -m cp -r rg_multi_geno_1e-1_mac_20/chr${chr}* $bucket/data/rg_results_20commonpcs_geno_1e-1_mac_20_no_hwe/ ;\
