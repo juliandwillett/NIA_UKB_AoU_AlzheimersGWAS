@@ -9,7 +9,7 @@ awk 'NR==1 {print "#FID\tIID\tSEX"} NR>1 {print "0\t" $1 "\t" "NA"}' arrays_auto
 mv tmp arrays_autosomes_post_qc_pruned_common.psam
 
 # Run regenie
-./regenie_v3.2.8.gz_x86_64_Linux \
+./regenie_v3.4.1.gz_x86_64_Centos7_mkl \
     --step 1 \
     --pgen arrays_autosomes_post_qc_pruned_common \
     --phenoFile regenie_pheno.txt \
