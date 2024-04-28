@@ -16,22 +16,26 @@ separate_loci = function(df) {
 
 ######################################
 # Then bring this data into AoU (in a zip file)
-unzip locus_hits_all.zip
-cohorts=("AoU" "UKB" "NIA" "Meta");
+unzip locus_hits.zip
+cohorts=("NIA" "NIMH" "NIA_NIMH_META" "UKB" "AOU" "UKB_AOU_META" "NIA_NIMH_UKB_AOU_META");
 
 for coh in "${cohorts[@]}"; do \
-  mkdir locus_hits_${coh}/beds/ ;\
-  mkdir locus_hits_${coh}/assoc_files/ ;\
-  mkdir locus_hits_${coh}/clumped/ ;\
-  cd locus_hits_${coh} ;\
+  mkdir locus_hits/locus_hits_${coh}/beds/ ;\
+  mkdir locus_hits/locus_hits_${coh}/assoc_files/ ;\
+  mkdir locus_hits/locus_hits_${coh}/clumped/ ;\
+  cd locus_hits/locus_hits_${coh} ;\
   for file in *.txt ; do \
-    awk '{print $15 "\t" $16 "\t" $16}' $file > beds/$file.bed ;\
-    awk -F'\t' '{print $1 "\t" $5 "\t" $6 "\t" $7 "\t" $8}' $file > assoc_files/$file.plink ;\
+    awk '{print $2 "\t" $3 "\t" $3}' $file > beds/$file.bed ;\
+    # ID \
+    awk -F'\t' '{print $1,$7, $8, $9, $8, $11, $12,$13,$15}' $file > assoc_files/$file.plink ;\
+    # IDrev \
+    awk -F'\t' 'NR > 1 {print $6,$7, $8, $9, $8, $11, $12,$13,$15}' $file >> assoc_files/$file.plink ;\
   done ;\
-  cd .. ;\
+  cd ../.. ;\
 done
   
 # First do clumping to help reduce the number of hits
+cd locus_hits
 for coh in "${cohorts[@]}"; do \
   for file in locus_hits_${coh}/beds/*.bed ; do \
     fname="${file##*/}" ;\
@@ -40,16 +44,23 @@ for coh in "${cohorts[@]}"; do \
     chr="${fname%%_*}" ;\
   
     # First do clumping
-    if [[ $coh == "AoU" ]]; then\
-      p_field="AoU_P" ;\
+    if [[ $coh == "NIA" ]]; then\
+      p_field="NIA_P" ;\
+    elif [[ $coh == "NIMH" ]]; then\
+      p_field="NIMH_P";\
+    elif [[ $coh == "NIA_NIMH_META" ]]; then\
+      p_field="NIA_NIMH_META_P" ;\
     elif [[ $coh == "UKB" ]]; then\
-      p_field="UKB_P";\
-    elif [[ $coh == "NIA" ]]; then\
-      p_field="NIA_P";\
-    else\
-      p_field="Meta_P";\
-    fi;\
-    ./plink2 --pfile pgen_qc/${chr}_geno_mac --extract bed1 $file \
+      p_field="UKB_P" ;\
+    elif [[ $coh == "AOU" ]]; then\
+      p_field="AOU_P" ;\
+    elif [[ $coh == "UKB_AOU_META" ]]; then\
+      p_field="UKB_AOU_META_P" ;\
+    elif [[ $coh == "NIA_NIMH_UKB_AOU_META" ]]; then\
+      p_field="NIA_NIMH_UKB_AOU_META_P" ;\
+    fi ;\
+      
+    ../plink2 --pfile ../pgen_qc/${chr}_geno_mac --extract bed1 $file \
       --clump locus_hits_${coh}/assoc_files/${fname}.txt.plink --clump-r2 0.01 --clump-id-field "ID" \
       --clump-p-field $p_field --out locus_hits_${coh}/clumped/$fname ;\
   done \
@@ -62,6 +73,10 @@ for coh in "${cohorts[@]}"; do \
     fname="${fname%.*}" ;\
     fname="${fname%.*}" ;\
   done ;\
+  
+  if [[ $coh == "NIMH" ]]; then \
+    continue ;\
+  fi ;\
   head -1 locus_hits_${coh}/clumped/$fname.clumps > locus_hits_${coh}/clumped/clumps.txt ;\
   for file in locus_hits_${coh}/clumped/*.clumps ; do \
     tail -n +2 "$file" >> locus_hits_${coh}/clumped/clumps.txt ;\
