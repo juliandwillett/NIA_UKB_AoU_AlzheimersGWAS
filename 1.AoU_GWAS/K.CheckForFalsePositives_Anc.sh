@@ -37,6 +37,32 @@ make_files_for_hwe = function() {
 {/R}
 
 ###########################
+# FIRST, ADD SEX TO CHR23 PSAM FOR HWE on X CHR
+{R}
+psam = vroom("pgen_qc/chr23_geno_mac.psam",skip = 1,col_names = F) %>% select(-X3)
+covar = vroom("regenie_input/regenie_covar.txt") %>% select(IID,Sex) %>% rename(SEX = Sex)
+names(psam) = c("#FID","IID")
+psam_not_in_covar = psam[which(!(psam$IID %in% covar$IID)),]
+
+# Merge, as faster than a for loop or lapply
+# Plink codes sex as: 1=male/2=female/0 for unknown. Regenie input has female as 0, male as 1
+out_psam = merge(psam,covar,by='IID') %>%
+    mutate(SEX = ifelse(SEX == 0,2,ifelse(SEX == 1,1,0))) %>%
+    relocate(`#FID`,.before='IID')
+out_psam %<>% add_row(psam_not_in_covar %>% mutate(SEX = NA)) %>%
+    mutate(`#FID` = 0)
+head(out_psam)
+nrow(out_psam)
+vroom_write(out_psam,"pgen_qc/chr23_geno_mac_sexupdated.psam")
+{/R}
+###
+# CONFIRM SEX APPROPRIATELY UPDATED, THEN REPLACE. ENSURE LINE COUNT GOOD, should be 244845
+# IF SOMETHING BREAKS, TAKE PSAM FROM BUCKET (QC WILL NOT CHANGE THAT)
+head -2 pgen_qc/chr23_geno_mac_sexupdated.psam
+mv pgen_qc/chr23_geno_mac_sexupdated.psam pgen_qc/chr23_geno_mac.psam
+
+###################
+# HWE STUFF
 # BASH, on AoU
 mkdir hwe_testing ; mkdir hwe_testing/hardy_out/
 awk '{print $1 "\t" $2}' pgen_qc/chr1_geno_mac.psam > all_ids.txt
