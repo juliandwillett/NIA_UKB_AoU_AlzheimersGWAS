@@ -68,7 +68,8 @@ mkdir hwe_testing ; mkdir hwe_testing/hardy_out/
 awk '{print $1 "\t" $2}' pgen_qc/chr1_geno_mac.psam > all_ids.txt
 ancestries=(all eur afr amr sas eas mid)
 
-# Run the hardy calculations
+# Run the hardy calculations. 
+# Segmentation faults on X chromosome for single ancestries even with >600 GB of RAM. Mark as limitation
 for ((chr=1;chr<=23;chr++)); do \
   for anc in "${ancestries[@]}"; do \
     ./plink2 --pfile pgen_qc/chr${chr}_geno_mac --keep ${anc}_ids.txt \
