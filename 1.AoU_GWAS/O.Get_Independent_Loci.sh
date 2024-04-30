@@ -83,6 +83,7 @@ for coh in "${cohorts[@]}"; do \
   done;\
 done
 
+mkdir clumps
 for coh in "${cohorts[@]}"; do \
   mv locus_hits_${coh}/clumped/clumps.txt clumps/clumps_${coh}.txt ;\
 done
