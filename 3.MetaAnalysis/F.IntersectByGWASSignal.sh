@@ -32,4 +32,4 @@ awk 'NR==FNR{arr[$3]; next} $19 in arr' working/gwas_gwsig_for_intersect.txt \
 # NIAGADS NIMH UKB AOU META INTERSECT
 awk 'NR==FNR{arr[$3]; next} $19 in arr' working/gwas_gwsig_for_intersect.txt \
   final_meta_results/meta_niagads_nimh_ukb_aou_chrposrefalt_chrpos.TBL > \
-  working/ukb_aou_meta_intersects_chrpos.txt
+  working/niagads_nimh_ukb_aou_meta_intersects_chrpos.txt
