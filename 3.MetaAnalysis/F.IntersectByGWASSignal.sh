@@ -24,6 +24,21 @@ awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
   ../Data_Links/AoU_GWAS/CommonPCs_NonMCC_Geno1e-1_MAC20/aou_ad_any_anc_all_gwas_geno_1e-1_mac20_common_pcs_w_chr23_pvals_chrpos.txt > \
   working/aou_intersects_chrpos.txt ;\
 
+# AOU AFR INTERSECT:
+awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
+  ../Data_Links/AoU_GWAS/AncStrat_BT_Multianc_PCs/aou_AD_any_anc_afr_gwas_hyphenid_pval_chrpos.txt > \
+  working/aou_afr_intersects_chrpos.txt ;\
+
+# AOU AMR INTERSECT:
+awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
+  ../Data_Links/AoU_GWAS/AncStrat_BT_Multianc_PCs/aou_AD_any_anc_amr_gwas_hyphenid_pval_chrpos.txt > \
+  working/aou_amr_intersects_chrpos.txt ;\
+
+# AOU EUR INTERSECT:
+awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
+  ../Data_Links/AoU_GWAS/AncStrat_BT_Multianc_PCs/aou_AD_any_anc_eur_gwas_hyphenid_pval_chrpos.txt > \
+  working/aou_eur_intersects_chrpos.txt ;\
+
 # UKB AOU META INTERSECT
 awk 'NR==FNR{arr[$3]; next} $19 in arr' working/gwas_gwsig_for_intersect.txt \
   /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_ukb_aou_chrposrefalt_chrpos.TBL > \
