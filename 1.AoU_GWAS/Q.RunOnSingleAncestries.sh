@@ -41,3 +41,26 @@ for anc in "${ancestries[@]}"; do \
     --phenoCol AD_any ;\
 done ;\
 gsutil -m cp -rn rg_step1_singleanc/aou_step1_rg_common* $WORKSPACE_BUCKET/data/regenie_step1_singleanc_anc_pcs/
+
+# REGENIE STEP 2
+ancestries=(amr afr eur)
+for ((chr=23;chr<=23;chr++)); do \
+        curr_chr="chr${chr}" ;\
+        for anc in "${ancestries[@]}"; do \
+                # orig string in first line, replacement in second
+                #awk '{gsub("duplicateofalzheimersgwastake5d1", "duplicateofduplicateofalzheimersgwastake6", $2)} 1' aou_step1_rg_array_anc_${anc}_pred.list > revised_pred.list
+                ./regenie_v3.4.1.gz_x86_64_Centos7_mkl \
+                    --step 2 \
+                    --pgen pgen_qc/chr${chr}_geno_mac \
+                    --phenoFile regenie_input/regenie_pheno.txt \
+                    --covarFile regenie_input/regenie_covar_${anc}.txt \
+                    --bt --firth-se \
+                    --firth --approx --pThresh 0.01 \
+                    --pred rg_step1_singleanc/aou_step1_rg_common_${anc}_pred.list \
+                    --bsize 400 \
+                    --out rg_step2_singleanc/${curr_chr}_${anc}_ancspecific_pcs \
+                    --minMAC 20 \
+                    --phenoCol AD_any ;\
+        done  ;\
+done
+gsutil -m cp -r rg_step2_singleanc/* $WORKSPACE_BUCKET/data/regenie_step2_singleanc_anc_pcs/ ;\
