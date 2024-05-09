@@ -25,18 +25,18 @@ awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
   working/aou_intersects_chrpos.txt ;\
 
 # AOU AFR INTERSECT:
-awk 'NR==FNR{arr[$3]; next} $17 in arr' working/gwas_gwsig_for_intersect.txt \
-  ../Data_Links/AoU_GWAS/AncStrat_BT_Multianc_PCs/aou_AD_any_anc_afr_gwas_hyphenid_pval_chrpos.txt > \
+awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
+  ../Data_Links/AoU_GWAS/AncStrat_BT_SingleAnc_PCs/aou_afr_summ_stats_AD_any_allchr_pval_chrpos.txt > \
   working/aou_afr_intersects_chrpos.txt ;\
 
 # AOU AMR INTERSECT:
-awk 'NR==FNR{arr[$3]; next} $17 in arr' working/gwas_gwsig_for_intersect.txt \
-  ../Data_Links/AoU_GWAS/AncStrat_BT_Multianc_PCs/aou_AD_any_anc_amr_gwas_hyphenid_pval_chrpos.txt > \
+awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
+  ../Data_Links/AoU_GWAS/AncStrat_BT_SingleAnc_PCs/aou_amr_summ_stats_AD_any_allchr_pval_chrpos.txt > \
   working/aou_amr_intersects_chrpos.txt ;\
 
 # AOU EUR INTERSECT:
-awk 'NR==FNR{arr[$3]; next} $17 in arr' working/gwas_gwsig_for_intersect.txt \
-  ../Data_Links/AoU_GWAS/AncStrat_BT_Multianc_PCs/aou_AD_any_anc_eur_gwas_hyphenid_pval_chrpos.txt > \
+awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
+  ../Data_Links/AoU_GWAS/AncStrat_BT_SingleAnc_PCs/aou_eur_summ_stats_AD_any_allchr_pval_chrpos.txt > \
   working/aou_eur_intersects_chrpos.txt ;\
 
 # UKB AOU META INTERSECT
