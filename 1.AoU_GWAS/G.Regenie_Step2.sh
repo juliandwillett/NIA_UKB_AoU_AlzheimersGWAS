@@ -97,6 +97,16 @@ for ((chr=2;chr<=22;chr++)); do \
 done
 gsutil -m cp -r rg_step2_singleanc_anc_specific_pcs/* $WORKSPACE_BUCKET/data/rg_results_anc_strat_ancspecific_pcs/ ;\
 
-
-#####
-# Code for parallelizing
+# Check single variants for sex specific effects
+./regenie_v3.4.1.gz_x86_64_Centos7_mkl \
+                    --step 2 \
+                    --pgen pgen_qc/18_48238744 \
+                    --phenoFile regenie_input/regenie_pheno.txt \
+                    --covarFile regenie_input/regenie_covar_commonpcs_female.txt \
+                    --bt --firth-se \
+                    --firth --approx --pThresh 0.01 \
+                    --pred rg_sexspecific/rg_step1_female_pred.list \
+                    --bsize 400 \
+                    --out rg_sexspecific/rg_step2_chr18_48238744_female \
+                    --minMAC 20 \
+                    --phenoCol AD_any 
