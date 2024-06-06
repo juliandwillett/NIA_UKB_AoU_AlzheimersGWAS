@@ -11,11 +11,11 @@ mv tmp arrays_autosomes_post_qc_pruned_common.psam
 # Run regenie
 ./regenie_v3.4.1.gz_x86_64_Centos7_mkl \
     --step 1 \
-    --pgen arrays_autosomes_post_qc_pruned_common \
-    --phenoFile regenie_pheno.txt \
-    --covarFile regenie_covar.txt \
+    --pgen array_data/arrays_autosomes_post_qc_pruned_common \
+    --phenoFile regenie_input/regenie_pheno.txt \
+    --covarFile regenie_input/regenie_covar_commonpcs_female.txt \
     --bt \
-    --out aou_step1_rg_array_common_rare_pcs \
+    --out rg_sexspecific/rg_step1_female \
     --bsize 1000 \
     --lowmem \
     --lowmem-prefix tmp_rg_40 \
