@@ -77,34 +77,10 @@ ukb_new_df = data.frame(Group = c("Case","Control"), PercFemale = c(ukb_perc_fem
 mutate(Cohort = "UKB")
 
 # Make plot
-
 plt_df = aou_new_df %>% add_row(ukb_new_df)
 ggplot(plt_df,aes(x=Group,y=PercFemale,fill=Cohort)) + 
 geom_bar(position = "dodge",stat = "identity", color = "blue",alpha = 0.7) +
   labs(x = "AD Status", y = "Percentage Female") +
-  theme_minimal() + theme(axis.text = element_text(size = 16),   
-    axis.title = element_text(size = 20),  
-    axis.text.x = element_text(size = 16),
-    axis.text.y = element_text(size = 16),
-    legend.text = element_text(size = 16),
-    legend.title = element_text(size = 16))
-
-## Ancestry distribution
-aou_perc_eur_case = length(which(merged_df$AD_any == 1 & merged_df$ancestry_pred == "eur")) / length(which(merged_df$AD_any == 1))
-aou_perc_eur_control = length(which(merged_df$AD_any == 0 & merged_df$ancestry_pred == "eur")) / length(which(merged_df$AD_any == 0))
-aou_new_df = data.frame(Group = c("Case","Control"), PercEUR = c(aou_perc_eur_case,aou_perc_eur_control)) %>%
-mutate(Cohort = "AoU")
-
-ukb_perc_eur_case = length(which(ukb_vars$ad_proxy == 1 & ukb_vars$White)) / length(which(ukb_vars$ad_proxy == 1))
-ukb_perc_eur_control = length(which(ukb_vars$ad_proxy == 0 & ukb_vars$White)) / length(which(ukb_vars$ad_proxy == 0))
-ukb_new_df = data.frame(Group = c("Case","Control"), PercEUR = c(ukb_perc_eur_case,ukb_perc_eur_control)) %>%
-mutate(Cohort = "UKB")
-
-# Make plot
-plt_df = aou_new_df %>% add_row(ukb_new_df)
-ggplot(plt_df,aes(x=Group,y=PercEUR,fill=Cohort)) + 
-geom_bar(position = "dodge",stat = "identity", color = "blue",alpha = 0.7) +
-  labs(x = "AD Status", y = "Percentage EUR") +
   theme_minimal() + theme(axis.text = element_text(size = 16),   
     axis.title = element_text(size = 20),  
     axis.text.x = element_text(size = 16),
