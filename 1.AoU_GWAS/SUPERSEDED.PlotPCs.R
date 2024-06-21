@@ -1,3 +1,5 @@
+DEPRECATED
+
 # Plot PCs for all populations, then for each subpopulation queried (AFR,AMR,EUR)
 
 pcs = vroom("regenie_covar_20pcs.txt",show_col_types = F)
