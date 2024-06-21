@@ -1,3 +1,5 @@
+DEPRECATED
+
 # First ensure existing hits file is present
 head -2 aou_AD_any_anc_all_gwas_pvals_ids_gwsig.txt
 
