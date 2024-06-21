@@ -1,3 +1,5 @@
+DEPRECATED
+
 # Operate on male or female sex to evaluate for role of sex on significance of hits
 # Employs files produced by earlier steps
 #    Plink file (QC is solely call rate and mac of 20): anc_hwe_test/${chr}
