@@ -1,0 +1,15 @@
+SCHEME SAMPLESIZE
+AVERAGEFREQ ON
+MINMAXFREQ ON
+
+MARKER   ID
+ALLELE   ALLELE1 ALLELE0
+FREQ     A1FREQ
+PVAL     Pval
+WEIGHT n
+EFFECT z
+
+PROCESS /n/home09/jwillett/true_lab_storage/Data_Links/NIAGADS_Personal/niagads_all_allchr_nohwe_formeta.txt
+PROCESS /n/home09/jwillett/true_lab_storage/Data_Links/NIMH/minorallele_merged_res_NIMH+NIA2247_Aff.offset.a.full.dn8_formeta.txt
+
+ANALYZE HETEROGENEITY
