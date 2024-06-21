@@ -1,3 +1,5 @@
+DEPRECATED
+
 ################
 # GET FOR ANC STRATIFIED RESULTS
 ancestries=(eur amr afr) ;\
