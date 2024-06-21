@@ -1,5 +1,4 @@
-# AoU_AlzheimersGWAS
-AoU GWAS work.
+# Alzheimer's Meta-Analysis
 
 Data collection was accomplished by following the bash scripts in the different folders, or as described in the manuscript.
 
