@@ -91,9 +91,7 @@ done
 ################
 
 
-
-
-
+DEPRECATED CODE BELOW
 
 # Then do conditional analysis, either with regenie or GCTA-COJO. Regenie would probably be better.
 # For regenie conditional analysis.
