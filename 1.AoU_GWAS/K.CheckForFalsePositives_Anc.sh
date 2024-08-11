@@ -70,7 +70,7 @@ ancestries=(all eur afr amr sas eas mid)
 
 # Run the hardy calculations. 
 # Segmentation faults on X chromosome for single ancestries even with >600 GB of RAM. Mark as limitation
-for ((chr=1;chr<=23;chr++)); do \
+for ((chr=1;chr<=22;chr++)); do \
   for anc in "${ancestries[@]}"; do \
     ./plink2 --pfile pgen_qc/chr${chr}_geno_mac --keep ${anc}_ids.txt \
       --hardy midp --out hwe_testing/hardy_out/${chr}_${anc} --extract bed1 hwe_testing/all_study_hits.bed ;\
