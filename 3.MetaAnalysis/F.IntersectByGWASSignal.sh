@@ -10,9 +10,20 @@ awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
   working/nimh_intersects_chrpos.txt ;\
 
 # NIAGADS NIMH META INTERSECT
+awk 'NR==1 {$19 = "CHRPOS"; print} NR>1 {$19 = $16 "-" $17; print}' \
+  /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_niagads_nimh_nohwe_chrposrefalt.TBL >\
+  /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_niagads_nimh_nohwe_chrposrefalt_chrpos.TBL ;\
 awk 'NR==FNR{arr[$3]; next} $19 in arr' working/gwas_gwsig_for_intersect.txt \
-  /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_niagads_nimh_chrposrefalt_chrpos.TBL > \
+  /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_niagads_nimh_nohwe_chrposrefalt_chrpos.TBL > \
   working/niagads_nimh_meta_intersects_chrpos.txt ;\
+
+# NIAGADS NIMH META INTERSECT NON MATCHING
+awk 'NR==1 {$19 = "CHRPOS"; print} NR>1 {$19 = $16 "-" $17; print}' \
+  /n/holystore01/LABS/tanzi_lab/Users/dmitry/AoU/unified_ids/metal/NIAGADS_NIMH_nonmatchingonly1_chrposrefalt.TBL >\
+  /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_niagads_nimh_nonmatched_chrposrefalt_chrpos.TBL ;\
+awk 'NR==FNR{arr[$3]; next} $19 in arr' working/gwas_gwsig_for_intersect.txt \
+  /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_niagads_nimh_nonmatched_chrposrefalt_chrpos.TBL > \
+  working/niagads_nimh_meta_intersects_nonmatching_chrpos.txt ;\
 
 # UKB intersect
 awk 'NR==FNR{arr[$3]; next} $15 in arr' working/gwas_gwsig_for_intersect.txt \
@@ -44,7 +55,10 @@ awk 'NR==FNR{arr[$3]; next} $19 in arr' working/gwas_gwsig_for_intersect.txt \
   /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_ukb_aou_chrposrefalt_chrpos.TBL > \
   working/ukb_aou_meta_intersects_chrpos.txt ;\
 
-# NIAGADS NIMH UKB AOU META INTERSECT
+# UKB AOU META NON MATCHING INTERSECT
+awk 'NR==1 {$19 = "CHRPOS"; print} NR>1 {$19 = $16 "-" $17; print}' \
+  /n/holystore01/LABS/tanzi_lab/Users/dmitry/AoU/unified_ids/metal/NIAGADS_NIMH_nonmatchingonly1_chrposrefalt.TBL >\
+  /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_niagads_nimh_nonmatched_chrposrefalt_chrpos.TBL ;\
 awk 'NR==FNR{arr[$3]; next} $19 in arr' working/gwas_gwsig_for_intersect.txt \
-  final_meta_results/meta_niagads_nimh_ukb_aou_chrposrefalt_chrpos.TBL > \
-  working/niagads_nimh_ukb_aou_meta_intersects_chrpos.txt
+  /n/home09/jwillett/true_lab_storage/00_AoU/final_meta_results/meta_niagads_nimh_nonmatched_chrposrefalt_chrpos.TBL > \
+  working/ukb_aou_meta_intersects_nonmatched_chrpos.txt
